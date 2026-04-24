@@ -47,55 +47,56 @@ La solución aprovecha las siguientes capacidades del móvil:
 ## Diagrama de Caso de Uso Principal
 
 **Caso de Uso Principal**: Registrar Nueva Tarea y Configurar Notificación
-
-flowchart TD
-    A[Usuario abre STUDY TRACK] --> B[Pantalla principal - Calendario]
-    B --> C{¿Crear tarea?}
+```mermaid
+graph TD
+    A[Usuario abre STUDY TRACK] --> B[Pantalla principal - Calendario];
+    B --> C{¿Crear tarea?};
     
-    C -->|No| D[Ver/editar tareas existentes]
-    D --> B
+    C -->|No| D[Ver/editar tareas existentes];
+    D --> B;
     
-    C -->|Sí| E[Completar formulario]
-    E --> F[Configurar recordatorio]
+    C -->|Sí| E[Completar formulario];
+    E --> F[Configurar recordatorio];
     
-    F --> G{Tipo de recordatorio}
+    F --> G{Tipo de recordatorio};
     
-    G -->|Una hora antes| H[H-1]
-    G -->|Un día antes| I[H-24]
-    G -->|Personalizado| J[T- X horas/días]
+    G -->|Una hora antes| H[H-1];
+    G -->|Un día antes| I[H-24];
+    G -->|Personalizado| J[T- X horas/días];
     
-    H --> K{¿Recurrente?}
-    I --> K
-    J --> K
+    H --> K{¿Recurrente?};
+    I --> K;
+    J --> K;
     
-    K -->|No| L[Único]
-    K -->|Sí| M{¿Frecuencia?}
+    K -->|No| L[Único];
+    K -->|Sí| M{¿Frecuencia?};
     
-    M -->|Diario| N[Diario]
-    M -->|Semanal| O[Semanal]
-    M -->|Personalizado| P[Intervalo custom]
+    M -->|Diario| N[Diario];
+    M -->|Semanal| O[Semanal];
+    M -->|Personalizado| P[Intervalo custom];
     
-    L --> Q[Guardar tarea]
-    N --> Q
-    O --> Q
-    P --> Q
+    L --> Q[Guardar tarea];
+    N --> Q;
+    O --> Q;
+    P --> Q;
     
-    Q --> R[Esperar evento]
-    R --> S{¿Hora programada?}
+    Q --> R[Esperar evento];
+    R --> S{¿Hora programada?};
     
-    S -->|Sí| T[Enviar notificación]
-    S -->|No| R
+    S -->|Sí| T[Enviar notificación];
+    S -->|No| R;
     
-    T --> U[Usuario abre app?]
-    U -->|Sí| V[Ver detalle]
-    U -->|No| W[En bandeja]
+    T --> U[Usuario abre app?];
+    U -->|Sí| V[Ver detalle];
+    U -->|No| W[En bandeja];
     
-    V --> X[¿Completada?]
-    X -->|Sí| Y[Marcar y actualizar]
-    X -->|No| B
+    V --> X[¿Completada?];
+    X -->|Sí| Y[Marcar y actualizar];
+    X -->|No| B;
     
-    Y --> B
-    W --> B
+    Y --> B;
+    W --> B;
+```
 
 ## Investigación
 
