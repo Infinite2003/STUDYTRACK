@@ -104,3 +104,24 @@ Este proyecto incluye un análisis de aplicaciones similares y el detalle técni
 
 📄 [Ir a RESEARCH.md](./RESEARCH.md)
 
+
+## Instrucciones de Uso
+
+- **1** : Al abrir la aplicación, se mostrará la pantalla principal (Home), donde se presenta una vista general de la aplicación y sus funciones principales.
+
+- **2** : Desde la pantalla inicial, el usuario podrá acceder a las distintas secciones mediante los botones de navegación disponibles.
+
+### 3 : Sección Calendario:
+    - Permite visualizar fechas importantes relacionadas con actividades académicas.
+    - Próximamente incorporará tareas organizadas por día.
+
+### 4 : Sección Tareas:
+    - Muestra una lista de tareas pendientes y completadas.
+    - Permite revisar entregas próximas y organización personal.
+
+- ### 5: Sección Acerca de :
+    - Presentación de información general del proyecto y sus principales características
+
+- **6** : Para desplazarse entre pantallas, utilice los botones del menú o los accesos disponibles en cada vista.
+
+- **7** : El botón flotante con símbolo + permitirá agregar nuevas tareas o eventos en futuras versiones.
