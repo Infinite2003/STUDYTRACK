@@ -27,7 +27,19 @@ class AboutScreen extends StatelessWidget {
             onPressed: () {
               Navigator.pushNamed(context, '/tasks');
             },
-          )
+          ),
+
+          IconButton(
+            icon: const Icon(Icons.help),
+            tooltip: 'Ayuda',
+            onPressed: () => Navigator.pushNamed(context, '/help'),
+          ),
+
+          IconButton(
+            icon: const Icon(Icons.person),
+            tooltip: 'Mi Perfil',
+            onPressed: () => Navigator.pushNamed(context, '/profile'),
+          ),
         ],
       ),
 

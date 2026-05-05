@@ -59,6 +59,18 @@ class TasksScreen extends StatelessWidget {
               Navigator.pushNamed(context, '/about');
             },
           ),
+
+          IconButton(
+            icon: const Icon(Icons.person),
+            tooltip: 'Mi Perfil',
+            onPressed: () => Navigator.pushNamed(context, '/profile'),
+          ),
+
+          IconButton(
+            icon: const Icon(Icons.help),
+            tooltip: 'Ayuda',
+            onPressed: () => Navigator.pushNamed(context, '/help'),
+          ),
         ],
       ),
 
@@ -66,9 +78,18 @@ class TasksScreen extends StatelessWidget {
         itemBuilder: (context, index) {
 
           final task = listMaqueta[index];
-          return TaskCard(task: task);
-        },
+          return GestureDetector(
+            onTap: (){
+              Navigator.pushNamed(
+                context,
+                '/task-detail',
+                arguments: task,
+              );
+            },
 
+            child: TaskCard(task: task),
+          );
+        },
         itemCount: listMaqueta.length,
       ),
 

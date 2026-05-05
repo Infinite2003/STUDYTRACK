@@ -20,7 +20,7 @@ class TaskDetailScreen extends StatelessWidget {
             tooltip: 'Editar',
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Editar tarea (Próximamente)')),
+                const SnackBar(content: Text('Editar tarea')),
               );
             },
           ),
@@ -29,7 +29,7 @@ class TaskDetailScreen extends StatelessWidget {
             tooltip: 'Eliminar',
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Eliminar tarea (Próximamente)')),
+                const SnackBar(content: Text('Eliminar tarea')),
               );
             },
           ),
@@ -119,7 +119,7 @@ class TaskDetailScreen extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Marcar como completada (Próximamente)')),
+                        const SnackBar(content: Text('Marcar como completada')),
                       );
                     },
                     icon: const Icon(Icons.check),

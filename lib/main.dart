@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
         '/about' : (context) => const AboutScreen(),
         '/profile' : (context) => const ProfileScreen(),
         '/help' : (context) => const HelpScreen(),
-        'task-detail' : (context) {
+        '/task-detail' : (context) {
           final task = ModalRoute.of(context)!.settings.arguments as Task;
           return TaskDetailScreen(task: task);
         }
