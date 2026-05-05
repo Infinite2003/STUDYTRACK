@@ -125,3 +125,121 @@ Este proyecto incluye un análisis de aplicaciones similares y el detalle técni
 - **6** : Para desplazarse entre pantallas, utilice los botones del menú o los accesos disponibles en cada vista.
 
 - **7** : El botón flotante con símbolo + permitirá agregar nuevas tareas o eventos en futuras versiones.
+
+## Arquitectura y Patrones
+
+### Arquitectura del Proyecto
+
+La aplicación STUDYTRACK está desarrollada utilizando el framework Flutter y sigue una arquitectura modular basada en la separación de responsabilidades.
+
+La estructura del proyecto se organiza de la siguiente manera:
+
+```text
+lib/
+├── models/
+│   └── task.dart
+├── ui/
+│   ├── screens/
+│   │   ├── calendar_screen.dart
+│   │   ├── tasks_screen.dart
+│   │   ├── task_detail_screen.dart
+│   │   ├── about_screen.dart
+│   │   ├── help_screen.dart
+│   │   └── profile_screen.dart
+│   └── widgets/
+│       ├── task_card.dart
+│       └── feature_card.dart
+└── main.dart
+```
+###  Justificación de la estructura
+
+#### models/
+Contiene la representación de datos del sistema:
+- **Ejemplo:** `Task`
+- Define atributos como título, descripción y fecha límite
+- Independiente de la UI
+
+Esto permite que la lógica de datos pueda reutilizarse o cambiar su fuente (por ejemplo, base de datos o API) sin afectar la interfaz.
+
+#### ui/screens/
+Contiene todas las pantallas principales de la aplicación. Cada archivo representa una vista completa:
+- `calendar_screen.dart` → vista principal (Home)
+- `tasks_screen.dart` → lista de tareas
+- `task_detail_screen.dart` → detalle de tarea
+- `about_screen.dart`, `help_screen.dart`, `profile_screen.dart` → pantallas informativas
+
+Separar por pantallas mejora la organización y facilita la navegación.
+
+#### 🔹 ui/widgets/
+Contiene componentes reutilizables:
+- `task_card.dart` → representación visual de una tarea
+- `feature_card.dart` → elementos informativos
+
+ Evita duplicación de código y mantiene consistencia visual.
+
+#### 🔹 main.dart
+Punto de entrada de la aplicación:
+- Configura el tema global (ThemeData)
+- Define rutas nombradas (routes)
+- Controla la navegación principal
+
+### Patrón de Diseño
+
+Se aplica una arquitectura inspirada en separación por capas (similar a MVVM simplificado):
+
+| Capa | Ubicación |
+|------|-----------|
+| **Modelo (Model)** | `models/` |
+| **Vista (View)** | `screens/` y `widgets/` |
+| **Control de navegación y estado básico** | `main.dart` + `Navigator` |
+
+Aunque no se implementa un ViewModel formal, la separación permite escalar fácilmente hacia patrones más robustos en el futuro (Provider, Riverpod, BLoC).
+
+### Jerarquía de Navegación
+
+La aplicación utiliza navegación basada en **rutas nombradas** mediante el widget `Navigator` de Flutter.
+
+#### Ruta inicial
+
+La pantalla principal es el calendario
+
+Estructura de Navegación:
+
+```text
+Calendar (Home)
+ ├── Tasks
+ │    └── Task Detail
+ ├── About
+ ├── Profile
+ └── Help
+```
+
+##### Tipo de Navegación
+    - Navegación No Lineal
+    - Acceso a Múltiples Pantallas Desde la Barra Superior (AppBar)
+    - Uso de Navigator.pushNamed para transiciones
+
+Esto permite que el usuario pueda moverse libremente entre secciones sin seguir un flujo rigido
+
+#### Justificación de la navegación
+
+| Beneficio | Explicacion
+|----|--------------------|
+| Acceso rápido | Todas las pantallas son accesibles desde el AppBar |
+| Experiencia flexible | El usuario no depende de un flujo secuencial |
+| Escalabilidad | Se pueden agregar nuevas rutas fácilmente en main.dart |	
+
+#### Decisiones técnicas clave
+- Uso de rutas nombradas para centralizar la navegación
+
+- Separación clara entre datos (models) y UI (screens/widgets)
+
+- Componentización mediante widgets reutilizables
+
+- Estructura preparada para futuras mejoras:
+
+- Integración de base de datos (Hive/sqflite)
+
+- Notificaciones push (flutter_local_notifications)
+
+- Manejo de estado avanzado (Provider, Riverpod, BLoC)
