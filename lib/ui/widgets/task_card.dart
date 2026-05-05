@@ -2,11 +2,28 @@ import 'package:flutter/material.dart';
 import '../../models/task.dart';
 
 class TaskCard extends StatelessWidget{
-  const TaskCard({Key?key}) : super(key: key);
+
+  final Task task;
+
+  
+  const TaskCard({
+    Key?key,
+    required this.task
+    }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
+    
+    return Card(
+      elevation: 4,
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0)
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [],
+        ),
+      ),
+    );
   }
 }
