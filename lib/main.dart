@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:studytrack/models/task.dart';
 import 'ui/screens/calendar_screen.dart';
 import 'ui/screens/tasks_screen.dart';
 import 'ui/screens/about_screen.dart';
+import 'ui/screens/help_screen.dart';
+import 'ui/screens/profile_screen.dart';
+import 'ui/screens/task_detail_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -39,6 +43,12 @@ class MyApp extends StatelessWidget {
         '/calendar' : (context) => const CalendarScreen(),
         '/tasks' : (context) =>  TasksScreen(),
         '/about' : (context) => const AboutScreen(),
+        '/profile' : (context) => const ProfileScreen(),
+        '/help' : (context) => const HelpScreen(),
+        'task-detail' : (context) {
+          final task = ModalRoute.of(context)!.settings.arguments as Task;
+          return TaskDetailScreen(task: task);
+        }
       },
       
     );
