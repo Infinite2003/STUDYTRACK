@@ -27,6 +27,18 @@ class CalendarScreen extends StatelessWidget {
               Navigator.pushNamed(context, '/about');
             },
           ),
+
+          IconButton(
+            icon: const Icon(Icons.person),
+            tooltip: 'Mi Perfil',
+            onPressed: () => Navigator.pushNamed(context, '/profile'),
+          ),
+          
+          IconButton(
+            icon: const Icon(Icons.help),
+            tooltip: 'Ayuda',
+            onPressed: () => Navigator.pushNamed(context, '/help'),
+          ),
         ],
       ),
       body: Column(
