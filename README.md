@@ -243,3 +243,7 @@ Esto permite que el usuario pueda moverse libremente entre secciones sin seguir 
 - Notificaciones push (flutter_local_notifications)
 
 - Manejo de estado avanzado (Provider, Riverpod, BLoC)
+
+## Material de Apoyo
+
+https://youtu.be/nnMGWF5fdSc
