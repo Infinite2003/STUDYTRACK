@@ -1,58 +1,59 @@
 import 'package:flutter/material.dart';
-import 'package:studytrack/models/task.dart';
-import 'ui/screens/calendar_screen.dart';
-import 'ui/screens/tasks_screen.dart';
-import 'ui/screens/about_screen.dart';
-import 'ui/screens/help_screen.dart';
-import 'ui/screens/profile_screen.dart';
-import 'ui/screens/task_detail_screen.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
 
-void main() {
-  runApp(const MyApp());
+import 'data/hive_datasource.dart';
+import 'data/task_repository_impl.dart';
+import 'data/notification_service.dart';
+
+import 'domain/create_task_usecase.dart';
+
+import 'presentation/task_provider.dart';
+import 'presentation/poc_screen.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Hive.initFlutter();
+
+  await Hive.openBox(HiveDatasource.boxName);
+
+  final notificationService = NotificationService();
+
+  await notificationService.init();
+
+  final repository = TaskRepositoryImpl(
+    hiveDatasource: HiveDatasource(),
+    notificationService: notificationService,
+  );
+
+  runApp(
+    MyApp(repository: repository),
+  );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key:key);
+  final TaskRepositoryImpl repository;
 
-  // This widget is the root of your application.
+  const MyApp({
+    super.key,
+    required this.repository,
+  });
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'StudyTrack',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple,
-          primary: Colors.blue,
-          secondary: Colors.lightBlue
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => TaskProvider(
+            CreateTaskUseCase(repository),
+          ),
         ),
-
-        scaffoldBackgroundColor: Colors.grey[50],
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.blue,
-          foregroundColor: Colors.white,
-          elevation: 0,
-          centerTitle: true,
-        ),
-        useMaterial3: true,
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: const PocScreen(),
       ),
-
-      initialRoute: '/calendar',
-      routes: {
-        '/calendar' : (context) => const CalendarScreen(),
-        '/tasks' : (context) =>  TasksScreen(),
-        '/about' : (context) => const AboutScreen(),
-        '/profile' : (context) => const ProfileScreen(),
-        '/help' : (context) => const HelpScreen(),
-        '/task-detail' : (context) {
-          final task = ModalRoute.of(context)!.settings.arguments as Task;
-          return TaskDetailScreen(task: task);
-        }
-      },
-      
     );
   }
 }
-
-
