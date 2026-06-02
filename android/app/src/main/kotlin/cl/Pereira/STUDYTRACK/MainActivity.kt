@@ -1,4 +1,4 @@
-package com.example.studytrack
+package cl.Pereira.STUDYTRACK
 
 import io.flutter.embedding.android.FlutterActivity
 

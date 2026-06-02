@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme/material_theme.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -52,6 +53,11 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
+
+        theme: MaterialTheme(
+          ThemeData.light().textTheme,
+        ).light(),
+
         home: const PocScreen(),
       ),
     );
