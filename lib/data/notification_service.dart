@@ -8,10 +8,14 @@ class NotificationService {
     const AndroidInitializationSettings androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    const InitializationSettings settings =
-        InitializationSettings(android: androidSettings);
+    const InitializationSettings settings = InitializationSettings(
+      android: androidSettings,
+    );
 
-    await flutterLocalNotificationsPlugin.initialize(settings);
+    // En la versión 21.0.0, initialize requiere el parámetro nombrado 'settings'
+    await flutterLocalNotificationsPlugin.initialize(
+      settings: settings,
+    );
   }
 
   Future<void> showNotification() async {
@@ -23,14 +27,16 @@ class NotificationService {
       priority: Priority.high,
     );
 
-    const NotificationDetails details =
-        NotificationDetails(android: androidDetails);
+    const NotificationDetails details = NotificationDetails(
+      android: androidDetails,
+    );
 
+    // En la versión 21.0.0, show también usa parámetros nombrados
     await flutterLocalNotificationsPlugin.show(
-      0,
-      'STUDYTRACK',
-      'Tarea guardada correctamente',
-      details,
+      id: 0,
+      title: 'STUDYTRACK',
+      body: 'Tarea guardada correctamente',
+      notificationDetails: details,
     );
   }
 }

@@ -12,6 +12,9 @@ import 'domain/create_task_usecase.dart';
 import 'presentation/task_provider.dart';
 import 'presentation/poc_screen.dart';
 
+import 'presentation/preferences/preferences_provider.dart';
+import 'presentation/preferences/preferences_screen.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -50,6 +53,10 @@ class MyApp extends StatelessWidget {
             CreateTaskUseCase(repository),
           ),
         ),
+
+        ChangeNotifierProvider(
+          create: (_) => PreferencesProvider(),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -58,7 +65,7 @@ class MyApp extends StatelessWidget {
           ThemeData.light().textTheme,
         ).light(),
 
-        home: const PocScreen(),
+        home: const PreferencesScreen(),
       ),
     );
   }
