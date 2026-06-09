@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "question": "La aplicación es fácil de usar",
+    "min": 1,
+    "max": 5
+  },
+  {
+    "id": 2,
+    "question": "La interfaz es atractiva",
+    "min": 1,
+    "max": 5
+  },
+  {
+    "id": 3,
+    "question": "La aplicación ayuda a organizar tareas",
+    "min": 1,
+    "max": 5
+  }
+]

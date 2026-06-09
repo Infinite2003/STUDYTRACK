@@ -12,8 +12,13 @@ import 'domain/create_task_usecase.dart';
 import 'presentation/task_provider.dart';
 import 'presentation/poc_screen.dart';
 
+import 'viewmodels/survey_viewmodel.dart';
+import 'services/survey_loader.dart';
+
 import 'presentation/preferences/preferences_provider.dart';
 import 'presentation/preferences/preferences_screen.dart';
+
+import 'survey/survey_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -57,6 +62,12 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => PreferencesProvider(),
         ),
+
+        ChangeNotifierProvider(
+          create: (_) => SurveyViewModel(
+            SurveyLoader(),
+          )..loadQuestions(),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -65,7 +76,7 @@ class MyApp extends StatelessWidget {
           ThemeData.light().textTheme,
         ).light(),
 
-        home: const PreferencesScreen(),
+        home: const SurveyScreen(),
       ),
     );
   }
