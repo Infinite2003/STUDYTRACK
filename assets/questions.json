@@ -1,19 +1,49 @@
 [
   {
     "id": 1,
-    "question": "La aplicación es fácil de usar",
+    "question": "¿Qué tan fácil fue navegar por la aplicación?",
     "min": 1,
     "max": 5
   },
   {
     "id": 2,
-    "question": "La interfaz es atractiva",
+    "question": "¿Pudiste crear y gestionar tus tareas sin problemas?",
     "min": 1,
     "max": 5
   },
   {
     "id": 3,
-    "question": "La aplicación ayuda a organizar tareas",
+    "question": "¿La interfaz gráfica es atractiva y clara?",
+    "min": 1,
+    "max": 5
+  },
+  {
+    "id": 4,
+    "question": "¿El calendario te ayuda a visualizar tu carga académica?",
+    "min": 1,
+    "max": 5
+  },
+  {
+    "id": 5,
+    "question": "¿Las notificaciones de recordatorio son útiles?",
+    "min": 1,
+    "max": 5
+  },
+  {
+    "id": 6,
+    "question": "¿Qué tan probable es que recomiendes StudyTrack a otros estudiantes?",
+    "min": 1,
+    "max": 5
+  },
+  {
+    "id": 7,
+    "question": "¿La aplicación funcionó correctamente sin conexión a internet?",
+    "min": 1,
+    "max": 5
+  },
+  {
+    "id": 8,
+    "question": "En general, ¿qué tan satisfecho(a) estás con StudyTrack?",
     "min": 1,
     "max": 5
   }
