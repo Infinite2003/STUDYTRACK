@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../viewmodels/task_viewmodel.dart';
+import '../../presentation/preferences/preferences_provider.dart';
 import '../../domain/task2.dart';
 import '../widgets/task_card.dart';
 import '../widgets/add_edit_task_sheet.dart';
@@ -39,8 +40,7 @@ class TasksScreen extends StatelessWidget {
               Navigator.pop(context);
               context.read<TaskViewModel>().deleteTask(task.id);
             },
-            child:
-                const Text('Eliminar', style: TextStyle(color: Colors.red)),
+            child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -50,6 +50,7 @@ class TasksScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<TaskViewModel>();
+    final prefs = context.watch<PreferencesProvider>();
 
     return DefaultTabController(
       length: 2,
@@ -68,18 +69,16 @@ class TasksScreen extends StatelessWidget {
             ? const Center(child: CircularProgressIndicator())
             : TabBarView(
                 children: [
-                  // Pendientes
                   _TaskList(
-                    tasks: vm.pendingTasks,
+                    tasks: vm.sortedPending(prefs.sortBy),
                     emptyMessage: 'No tienes tareas pendientes 🎉',
                     emptyIcon: Icons.check_circle_outline,
                     vm: vm,
                     onEdit: (t) => _openEditTask(context, t),
                     onDelete: (t) => _confirmDelete(context, t),
                   ),
-                  // Completadas
                   _TaskList(
-                    tasks: vm.completedTasks,
+                    tasks: vm.sortedCompleted(prefs.sortBy),
                     emptyMessage: 'Aún no has completado tareas',
                     emptyIcon: Icons.hourglass_empty,
                     vm: vm,
@@ -88,14 +87,15 @@ class TasksScreen extends StatelessWidget {
                   ),
                 ],
               ),
-                floatingActionButton: FloatingActionButton.extended(
+        floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
             final vm = context.read<TaskViewModel>();
             showModalBottomSheet(
               context: context,
               isScrollControlled: true,
               shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(20))),
               builder: (_) => ChangeNotifierProvider.value(
                 value: vm,
                 child: const AddEditTaskSheet(),
@@ -142,8 +142,7 @@ class _TaskList extends StatelessWidget {
                     .primary
                     .withValues(alpha: 0.3)),
             const SizedBox(height: 16),
-            Text(emptyMessage,
-                style: Theme.of(context).textTheme.bodyLarge),
+            Text(emptyMessage, style: Theme.of(context).textTheme.bodyLarge),
           ],
         ),
       );

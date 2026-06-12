@@ -4,6 +4,9 @@ class PreferencesStorage {
   static const String notificationsKey = "notifications_enabled";
   static const String darkModeKey = "dark_mode";
   static const String reminderHoursKey = "reminder_hours";
+  static const String sortByKey = "sort_by"; // 'date' | 'creation'
+  static const String showCompletedInCalendarKey = "show_completed_calendar";
+  static const String startOnMondayKey = "start_on_monday"; 
 
   Future<void> saveNotifications(bool value) async {
     final prefs = await SharedPreferences.getInstance();
@@ -40,4 +43,32 @@ class PreferencesStorage {
 
     return prefs.getInt(reminderHoursKey) ?? 24;
   }
+
+  Future<void> saveSortBy(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(sortByKey, value);
+  }
+  Future<String> getSortBy() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(sortByKey) ?? 'date';
+  }
+
+  Future<void> saveShowCompletedInCalendar(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(showCompletedInCalendarKey, value);
+  }
+  Future<bool> getShowCompletedInCalendar() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(showCompletedInCalendarKey) ?? true;
+  }
+
+  Future<void> saveStartOnMonday(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(startOnMondayKey, value);
+  }
+  Future<bool> getStartOnMonday() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(startOnMondayKey) ?? true;
+  }
+  
 }

@@ -247,3 +247,17 @@ Esto permite que el usuario pueda moverse libremente entre secciones sin seguir 
 ## Material de Apoyo
 
 https://youtu.be/nnMGWF5fdSc
+
+## APK
+
+El APK de la aplicación está disponible en la raíz del repositorio para instalación directa en Android.
+
+**Archivo:** `studytrack-v1.0.0.apk`
+
+Para generar un nuevo APK desde el código fuente:
+
+```bash
+flutter build apk --release --target-platform android-arm64
+```
+
+> Para instalar el APK en un dispositivo Android ve a **Ajustes → Aplicaciones → (la app desde donde abres el archivo) → Permitir de esta fuente**.

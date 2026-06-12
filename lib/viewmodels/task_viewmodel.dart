@@ -29,7 +29,25 @@ class TaskViewModel extends ChangeNotifier {
   List<Task2> get completedTasks =>
       _tasks.where((t) => t.completed).toList();
 
-  /// Retorna tareas del día dado para el calendario
+  /// Tareas ordenadas según preferencia del usuario
+  List<Task2> sortedTasks(String sortBy) {
+    final list = List<Task2>.from(_tasks);
+    if (sortBy == 'date') {
+      list.sort((a, b) => a.dueDate.compareTo(b.dueDate));
+    } else {
+      // 'creation' — el id es un timestamp de creación
+      list.sort((a, b) => a.id.compareTo(b.id));
+    }
+    return list;
+  }
+
+  List<Task2> sortedPending(String sortBy) =>
+      sortedTasks(sortBy).where((t) => !t.completed).toList();
+
+  List<Task2> sortedCompleted(String sortBy) =>
+      sortedTasks(sortBy).where((t) => t.completed).toList();
+
+  /// Tareas del día para el calendario
   List<Task2> tasksForDay(DateTime day) {
     return _tasks.where((t) {
       return t.dueDate.year == day.year &&
@@ -54,13 +72,12 @@ class TaskViewModel extends ChangeNotifier {
   Future<bool> addTask(Task2 task) async {
     try {
       await createTaskUseCase.execute(task);
-      print('=== VM: tarea guardada, recargando... ===');
       _tasks = await getTasksUseCase.execute();
-      print('=== VM: _tasks después de recargar: ${_tasks.length} ===');
+      errorMessage = null;
       notifyListeners();
       return true;
     } catch (e) {
-      print('=== ERROR: $e ===');
+      errorMessage = 'Error al guardar: $e';
       notifyListeners();
       return false;
     }
@@ -69,7 +86,7 @@ class TaskViewModel extends ChangeNotifier {
   Future<bool> editTask(Task2 task) async {
     try {
       await updateTaskUseCase.execute(task);
-      _tasks = await getTasksUseCase.execute(); // recarga directa
+      _tasks = await getTasksUseCase.execute();
       errorMessage = null;
       notifyListeners();
       return true;
@@ -83,7 +100,7 @@ class TaskViewModel extends ChangeNotifier {
   Future<bool> deleteTask(String id) async {
     try {
       await deleteTaskUseCase.execute(id);
-      _tasks = await getTasksUseCase.execute(); // recarga directa
+      _tasks = await getTasksUseCase.execute();
       errorMessage = null;
       notifyListeners();
       return true;
@@ -98,7 +115,7 @@ class TaskViewModel extends ChangeNotifier {
     try {
       final updated = task.copyWith(completed: !task.completed);
       await updateTaskUseCase.execute(updated);
-      _tasks = await getTasksUseCase.execute(); // recarga directa
+      _tasks = await getTasksUseCase.execute();
       errorMessage = null;
       notifyListeners();
       return true;

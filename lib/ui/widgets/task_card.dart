@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../domain/task2.dart';
+import 'package:share_plus/share_plus.dart';
 
 class TaskCard extends StatelessWidget {
   final Task2 task;
@@ -102,9 +103,11 @@ class TaskCard extends StatelessWidget {
           onSelected: (value) {
             if (value == 'edit') onEdit();
             if (value == 'delete') onDelete();
+            if (value == 'share') _shareTask(context);
           },
           itemBuilder: (_) => const [
             PopupMenuItem(value: 'edit', child: Text('Editar')),
+            PopupMenuItem(value: 'share', child: Text('Compartir')),
             PopupMenuItem(
               value: 'delete',
               child: Text('Eliminar',
@@ -123,4 +126,24 @@ class TaskCard extends StatelessWidget {
     ];
     return '${date.day} ${months[date.month]} ${date.year}  ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
   }
+
+  void _shareTask(BuildContext context) {
+    final fechaVence = '${task.dueDate.day}/${task.dueDate.month}/${task.dueDate.year} '
+        '${task.dueDate.hour.toString().padLeft(2, '0')}:'
+        '${task.dueDate.minute.toString().padLeft(2, '0')}';
+
+    final texto = ' Tarea: ${task.title}\n'
+        'Descripción: ${task.description}\n'
+        'Vence: $fechaVence\n'
+        'Estado: ${task.completed ? "Completada" : "Pendiente"}\n\n'
+        'Enviado desde StudyTrack';
+
+    SharePlus.instance.share(
+      ShareParams(
+        text: texto,
+        subject: 'Tarea: ${task.title}',
+      ),
+    );
+  }
+
 }

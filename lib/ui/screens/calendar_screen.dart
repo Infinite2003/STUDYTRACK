@@ -4,6 +4,7 @@ import 'package:table_calendar/table_calendar.dart';
 
 import '../../viewmodels/task_viewmodel.dart';
 import '../../domain/task2.dart';
+import '../../presentation/preferences/preferences_provider.dart';
 import '../widgets/task_card.dart';
 import '../widgets/add_edit_task_sheet.dart';
 
@@ -61,8 +62,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               Navigator.pop(context);
               context.read<TaskViewModel>().deleteTask(task.id);
             },
-            child:
-                const Text('Eliminar', style: TextStyle(color: Colors.red)),
+            child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -72,7 +72,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<TaskViewModel>();
-    final tasksForDay = vm.tasksForDay(_selectedDay);
+    final prefs = context.watch<PreferencesProvider>();
+
+    // Filtra según preferencia de mostrar completadas
+    List<Task2> tasksForDay(DateTime day) {
+      return vm.tasksForDay(day).where((t) {
+        if (!prefs.showCompletedInCalendar && t.completed) return false;
+        return true;
+      }).toList();
+    }
+
+    final tasksSelected = tasksForDay(_selectedDay);
 
     return Scaffold(
       appBar: AppBar(
@@ -93,13 +103,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
       ),
       body: Column(
         children: [
-          // Calendario
           TableCalendar<Task2>(
             firstDay: DateTime.utc(2024, 1, 1),
             lastDay: DateTime.utc(2027, 12, 31),
             focusedDay: _focusedDay,
+            startingDayOfWeek: prefs.startOnMonday
+                ? StartingDayOfWeek.monday
+                : StartingDayOfWeek.sunday,
             selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-            eventLoader: vm.tasksForDay,
+            eventLoader: tasksForDay,
             calendarStyle: CalendarStyle(
               markerDecoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.primary,
@@ -113,7 +125,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 color: Theme.of(context)
                     .colorScheme
                     .primary
-                    .withOpacity(0.3),
+                    .withValues(alpha: 0.3),
                 shape: BoxShape.circle,
               ),
             ),
@@ -134,19 +146,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
           const Divider(height: 1),
 
-          // Lista de tareas del día seleccionado
           Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               children: [
                 Icon(Icons.list_alt,
                     color: Theme.of(context).colorScheme.primary, size: 18),
                 const SizedBox(width: 8),
                 Text(
-                  tasksForDay.isEmpty
+                  tasksSelected.isEmpty
                       ? 'Sin tareas este día'
-                      : '${tasksForDay.length} tarea(s)',
+                      : '${tasksSelected.length} tarea(s)',
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
               ],
@@ -156,7 +166,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           Expanded(
             child: vm.isLoading
                 ? const Center(child: CircularProgressIndicator())
-                : tasksForDay.isEmpty
+                : tasksSelected.isEmpty
                     ? Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
@@ -166,20 +176,19 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                 color: Theme.of(context)
                                     .colorScheme
                                     .primary
-                                    .withOpacity(0.3)),
+                                    .withValues(alpha: 0.3)),
                             const SizedBox(height: 12),
                             const Text('No hay tareas para este día'),
                           ],
                         ),
                       )
                     : ListView.builder(
-                        itemCount: tasksForDay.length,
+                        itemCount: tasksSelected.length,
                         itemBuilder: (_, i) {
-                          final task = tasksForDay[i];
+                          final task = tasksSelected[i];
                           return TaskCard(
                             task: task,
-                            onToggleComplete: () =>
-                                vm.toggleComplete(task),
+                            onToggleComplete: () => vm.toggleComplete(task),
                             onEdit: () => _openEditTask(task),
                             onDelete: () => _confirmDelete(context, task),
                           );
@@ -193,7 +202,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         icon: const Icon(Icons.add),
         label: const Text('Nueva tarea'),
       ),
-      bottomNavigationBar: BottomNav(currentIndex: 0),
+      bottomNavigationBar: const BottomNav(currentIndex: 0),
     );
   }
 }
