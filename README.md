@@ -244,6 +244,154 @@ Esto permite que el usuario pueda moverse libremente entre secciones sin seguir 
 
 - Manejo de estado avanzado (Provider, Riverpod, BLoC)
 
+
+## Arquitectura MVVM e Inyección de Dependencias
+
+### Implementación MVVM
+
+La aplicación implementa el patrón **Model-View-ViewModel** con separación estricta entre capas. Ninguna pantalla accede directamente a Hive o al servicio de notificaciones — todo pasa por el ViewModel.
+
+```mermaid
+graph TD
+    subgraph VIEW ["Vista - ui/screens y survey/"]
+        CS[CalendarScreen]
+        TS[TasksScreen]
+        SS[SurveyScreen]
+        PS[PreferencesScreen]
+        AE[AddEditTaskSheet]
+    end
+
+    subgraph VIEWMODEL ["ViewModel - viewmodels/"]
+        TVM[TaskViewModel\nChangeNotifier]
+        SVM[SurveyViewModel\nChangeNotifier]
+        PPR[PreferencesProvider\nChangeNotifier]
+    end
+
+    subgraph DOMAIN ["Dominio - domain/"]
+        TR[TaskRepository\nInterfaz abstracta]
+        CU[CreateTaskUseCase]
+        GU[GetTasksUseCase]
+        UU[UpdateTaskUseCase]
+        DU[DeleteTaskUseCase]
+    end
+
+    subgraph DATA ["Datos - data/"]
+        TRI[TaskRepositoryImpl]
+        HD[HiveDatasource]
+        NS[NotificationService]
+        PRS[PreferencesStorage]
+    end
+
+    CS -->|context.watch| TVM
+    TS -->|context.watch| TVM
+    AE -->|context.read| TVM
+    SS -->|context.watch| SVM
+    PS -->|context.watch| PPR
+
+    TVM --> CU & GU & UU & DU
+    CU & GU & UU & DU --> TR
+    TR --> TRI
+    TRI --> HD
+    TRI --> NS
+    PPR --> PRS
+```
+
+### Inyección de Dependencias
+
+Las dependencias se construyen en `main.dart` antes de iniciar la UI y se inyectan mediante `MultiProvider`:
+
+```mermaid
+graph LR
+    A[HiveDatasource] --> C
+    B[NotificationService] --> C
+    C[TaskRepositoryImpl] --> D[UseCases]
+    D --> E[TaskViewModel]
+    E --> G[MultiProvider]
+    F[PreferencesProvider] --> G
+    H[SurveyViewModel] --> G
+    G --> I[MaterialApp]
+```
+
+```dart
+// main.dart — construcción explícita del árbol de dependencias
+final repository = TaskRepositoryImpl(
+  hiveDatasource: HiveDatasource(),
+  notificationService: notificationService,
+);
+
+MultiProvider(
+  providers: [
+    ChangeNotifierProvider(create: (_) => TaskViewModel(
+      createTaskUseCase: CreateTaskUseCase(repository),
+      getTasksUseCase:   GetTasksUseCase(repository),
+      updateTaskUseCase: UpdateTaskUseCase(repository),
+      deleteTaskUseCase: DeleteTaskUseCase(repository),
+    )),
+    ChangeNotifierProvider(create: (_) => PreferencesProvider()..loadPreferences()),
+    ChangeNotifierProvider(create: (_) => SurveyViewModel(SurveyLoader())..loadQuestions()),
+  ],
+)
+```
+
+### Flujo de datos reactivo
+
+```mermaid
+sequenceDiagram
+    actor U as Usuario
+    participant V as View
+    participant VM as TaskViewModel
+    participant R as Repository
+    participant H as Hive
+
+    U->>V: Presiona "Crear tarea"
+    V->>VM: addTask(task)
+    VM->>R: createTaskUseCase.execute(task)
+    R->>H: box.put(task.id, task.toMap())
+    H-->>R: OK
+    R-->>VM: OK
+    VM->>H: getAllTasks()
+    H-->>VM: List Task2
+    VM->>VM: notifyListeners()
+    VM-->>V: UI se reconstruye automáticamente
+    V-->>U: Tarea visible en calendario y lista
+```
+
+### Diagrama PoC — Offline First y Notificaciones
+
+La Prueba de Concepto validó la integración asíncrona entre Hive y flutter_local_notifications antes de incorporarla a la rama principal:
+
+```mermaid
+graph TD
+    A[Usuario crea tarea] --> B[TaskRepositoryImpl]
+    B --> C[HiveDatasource\nbox.put task.id]
+    B --> D[NotificationService\nshow notificación]
+    C --> E[(Hive Box\noffline storage)]
+    D --> F[Sistema Android\nNotificación push]
+    
+    G[App reinicia sin internet] --> H[HiveDatasource\nbox.values]
+    H --> E
+    E --> I[Lista de tareas\nrecuperada correctamente]
+```
+
+**Resultado de la PoC:** Se validó que Hive persiste correctamente sin conexión y que `flutter_local_notifications` v21 requiere parámetros nombrados en su API (`id:`, `title:`, `body:`, `notificationDetails:`).
+
+---
+
+## Reporte de QA — Beta Testing
+
+### Instrumento de evaluación
+
+Encuesta de 8 preguntas (escala 1–5) cargada desde `assets/questions.json` y presentada dentro de la app. Al completarla, el usuario envía sus respuestas al correo del equipo mediante un Intent `mailto:` nativo.
+
+### Usuarios evaluadores
+
+| Tipo | Cantidad |
+|------|----------|
+| Participantes Digital Workspace Mobility | 2 |
+| Conocedores de la industria | 2 |
+| Externos a la industria | 2 |
+| **Total** | **10** |
+
 ## Material de Apoyo
 
 https://youtu.be/nnMGWF5fdSc
