@@ -1,163 +1,131 @@
 import 'package:flutter/material.dart';
-import '../widgets/feature_card.dart';
+import 'calendar_screen.dart';
 
 class AboutScreen extends StatelessWidget {
-  const AboutScreen({Key? key}) : super(key: key);
+  const AboutScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    
+    final color = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('Acerca de STUDYTRACK'),
-        actions: [
-
-          IconButton(
-            icon: const Icon(Icons.calendar_month),
-            tooltip: 'Ver Calendario',
-            onPressed: () {
-              Navigator.pushNamed(context, '/calendar');
-            },
-          ),
-
-          IconButton(
-            icon: const Icon(Icons.checklist),
-            tooltip: 'Ver Tareas',
-            onPressed: () {
-              Navigator.pushNamed(context, '/tasks');
-            },
-          ),
-
-          IconButton(
-            icon: const Icon(Icons.help),
-            tooltip: 'Ayuda',
-            onPressed: () => Navigator.pushNamed(context, '/help'),
-          ),
-
-          IconButton(
-            icon: const Icon(Icons.person),
-            tooltip: 'Mi Perfil',
-            onPressed: () => Navigator.pushNamed(context, '/profile'),
-          ),
-        ],
+        title: const Text('Acerca de'),
+        centerTitle: true,
       ),
-
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
-              Center(
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.shade100,
-                    shape: BoxShape.circle,
-                  ),
-
-                  child: const Icon(
-                    Icons.school,
-                    size: 64,
-                    color:  Colors.blue,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 24),
-              const Center(
-                child: Text(
-                  'STUDYTRACK',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 8),
-              const Center(
-                child: Text(
-                  'Versión: 1.0.0',
-                  style: TextStyle(color: Colors.grey),
-                ),
-              ),
-
-              const SizedBox(height: 40),
-              const Text(
-                '¿Qué es STUDYTRACK?',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                'Una aplicación diseñada para estudiantes que buscan organizar su tiempo de estudio de manera efectiva, evitando la procrastinación y la sobrecarga académica.',
-                style: TextStyle(fontSize: 16, height: 1.5),
-              ),
-              const SizedBox(height: 30),
-              const Text(
-                'Características',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 20),
-              FeatureCard(
-                icon: Icons.task_alt,
-                title: 'Gestión de Tareas',
-                description: 'Registra tareas, exámenes y proyectos con fechas límite.',
-                color: Colors.orange,
-              ),
-              const SizedBox(height: 16),
-              FeatureCard(
-                icon: Icons.calendar_month,
-                title: 'Calendario Interactivo',
-                description: 'Visualiza tu carga académica mes a mes.',
-                color: Colors.green,
-              ),
-              const SizedBox(height: 16),
-              FeatureCard(
-                icon: Icons.notifications_active,
-                title: 'Recordatorios Inteligentes',
-                description: 'Recibe notificaciones personalizadas antes de tus fechas clave.',
-                color: Colors.red,
-              ),
-              const SizedBox(height: 16),
-              FeatureCard(
-                icon: Icons.offline_bolt,
-                title: 'Modo Offline',
-                description: 'Funciona sin internet, tus datos siempre contigo.',
-                color: Colors.purple,
-              ),
-              const SizedBox(height: 30),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.blue.shade200),
-                ),
-                child: const Column(
-                  children: [
-                    Icon(Icons.code, color: Colors.blue),
-                    SizedBox(height: 12),
-                    Text(
-                      'Desarrollado con Flutter',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Logo / branding
+            Center(
+              child: Column(
+                children: [
+                  Container(
+                    width: 96,
+                    height: 96,
+                    decoration: BoxDecoration(
+                      color: color.primaryContainer,
+                      shape: BoxShape.circle,
                     ),
-                    SizedBox(height: 4),
-                    Text(
-                      'Disponible para iOS y Android',
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                  ],
-                ),
+                    child: Icon(Icons.menu_book,
+                        size: 52, color: color.primary),
+                  ),
+                  const SizedBox(height: 12),
+                  Text('STUDYTRACK',
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineMedium
+                          ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: color.primary)),
+                  const SizedBox(height: 4),
+                  Text('v1.0.0',
+                      style: Theme.of(context).textTheme.bodySmall),
+                ],
               ),
-              const SizedBox(height: 40),
-            ],
-          ),
+            ),
+            const SizedBox(height: 28),
+
+            Text('¿Qué es StudyTrack?',
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            const Text(
+              'StudyTrack es una aplicación móvil diseñada para estudiantes '
+              'que buscan organizar su tiempo de estudio y evitar la sobrecarga '
+              'académica. Permite registrar tareas, asignar fechas límite y '
+              'recibir recordatorios personalizados.',
+            ),
+            const SizedBox(height: 24),
+
+            Text('Características',
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            ..._features(context),
+
+            const SizedBox(height: 24),
+
+            Text('Tecnologías',
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                'Flutter',
+                'Dart',
+                'Hive',
+                'Provider (MVVM)',
+                'flutter_local_notifications',
+                'table_calendar',
+                'shared_preferences',
+              ]
+                  .map((t) => Chip(
+                        label: Text(t),
+                        backgroundColor: color.secondaryContainer,
+                        labelStyle:
+                            TextStyle(color: color.onSecondaryContainer),
+                      ))
+                  .toList(),
+            ),
+          ],
         ),
       ),
+      bottomNavigationBar: const BottomNav(currentIndex: 2),
     );
+  }
+
+  List<Widget> _features(BuildContext context) {
+    const features = [
+      (Icons.task_alt, 'Gestión de tareas (CRUD completo)'),
+      (Icons.calendar_month, 'Calendario interactivo'),
+      (Icons.notifications_active, 'Notificaciones de recordatorio'),
+      (Icons.wifi_off, 'Modo offline con Hive'),
+      (Icons.tune, 'Preferencias personalizables'),
+    ];
+    return features
+        .map((f) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(
+                children: [
+                  Icon(f.$1,
+                      size: 20,
+                      color: Theme.of(context).colorScheme.primary),
+                  const SizedBox(width: 12),
+                  Text(f.$2),
+                ],
+              ),
+            ))
+        .toList();
   }
 }

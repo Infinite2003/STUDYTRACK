@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'theme/material_theme.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -9,26 +8,35 @@ import 'data/notification_service.dart';
 
 import 'domain/create_task_usecase.dart';
 
-import 'presentation/task_provider.dart';
-import 'presentation/poc_screen.dart';
-
+import 'viewmodels/task_viewmodel.dart';
 import 'viewmodels/survey_viewmodel.dart';
 import 'services/survey_loader.dart';
 
 import 'presentation/preferences/preferences_provider.dart';
 import 'presentation/preferences/preferences_screen.dart';
-
+import 'ui/screens/calendar_screen.dart';
+import 'ui/screens/tasks_screen.dart';
+import 'ui/screens/about_screen.dart';
 import 'survey/survey_screen.dart';
+import 'theme/material_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Hive.initFlutter();
-
   await Hive.openBox(HiveDatasource.boxName);
 
-  final notificationService = NotificationService();
+  // Limpieza de registros legacy sin 'id'
+  final box = Hive.box(HiveDatasource.boxName);
+  final keysToDelete = box.keys.where((key) {
+    final val = box.get(key);
+    if (val is Map) return val['id'] == null;
+    return true;
+  }).toList();
+  await box.deleteAll(keysToDelete);
 
+  // A partir de aquí todo lo demás que ya tenías
+  final notificationService = NotificationService();
   await notificationService.init();
 
   final repository = TaskRepositoryImpl(
@@ -36,47 +44,52 @@ void main() async {
     notificationService: notificationService,
   );
 
-  runApp(
-    MyApp(repository: repository),
-  );
+  runApp(MyApp(repository: repository));
 }
 
 class MyApp extends StatelessWidget {
   final TaskRepositoryImpl repository;
-
-  const MyApp({
-    super.key,
-    required this.repository,
-  });
+  const MyApp({super.key, required this.repository});
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) => TaskProvider(
-            CreateTaskUseCase(repository),
+          create: (_) => TaskViewModel(
+            createTaskUseCase: CreateTaskUseCase(repository),
+            getTasksUseCase: GetTasksUseCase(repository),
+            updateTaskUseCase: UpdateTaskUseCase(repository),
+            deleteTaskUseCase: DeleteTaskUseCase(repository),
           ),
         ),
-
         ChangeNotifierProvider(
-          create: (_) => PreferencesProvider(),
+          create: (_) => PreferencesProvider()..loadPreferences(),
         ),
-
         ChangeNotifierProvider(
-          create: (_) => SurveyViewModel(
-            SurveyLoader(),
-          )..loadQuestions(),
+          create: (_) => SurveyViewModel(SurveyLoader())..loadQuestions(),
         ),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
+      child: Consumer<PreferencesProvider>(
+        builder: (context, prefs, _) {
+          final theme = MaterialTheme(Theme.of(context).textTheme);
 
-        theme: MaterialTheme(
-          ThemeData.light().textTheme,
-        ).light(),
-
-        home: const SurveyScreen(),
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'StudyTrack',
+            themeMode: prefs.darkMode ? ThemeMode.dark : ThemeMode.light,
+            theme: theme.light(),
+            darkTheme: theme.dark(),
+            initialRoute: '/calendar',
+            routes: {
+              '/calendar': (_) => const CalendarScreen(),
+              '/tasks': (_) => const TasksScreen(),
+              '/about': (_) => const AboutScreen(),
+              '/preferences': (_) => const PreferencesScreen(),
+              '/survey': (_) => const SurveyScreen(),
+            },
+          );
+        },
       ),
     );
   }

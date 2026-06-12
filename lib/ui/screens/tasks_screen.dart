@@ -1,107 +1,165 @@
 import 'package:flutter/material.dart';
-import '../../models/task.dart';
+import 'package:provider/provider.dart';
+
+import '../../viewmodels/task_viewmodel.dart';
+import '../../domain/task2.dart';
 import '../widgets/task_card.dart';
+import '../widgets/add_edit_task_sheet.dart';
+import 'calendar_screen.dart';
 
 class TasksScreen extends StatelessWidget {
-  TasksScreen({Key? key}) : super(key: key);
+  const TasksScreen({super.key});
 
-
-  final List<Task>listMaqueta = [
-
-    Task(
-      title: 'Calculo 2', 
-      description: 'Resolver guía N° 2. Otorga 5 décimas', 
-      dueDate: DateTime.now().add(const Duration(days: 5)), 
-      priority: 'Media'
+  void _openEditTask(BuildContext context, Task2 task) {
+    final vm = context.read<TaskViewModel>();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (_) => ChangeNotifierProvider.value(
+        value: vm,
+        child: AddEditTaskSheet(taskToEdit: task),
       ),
+    );
+  }
 
-    Task(
-      title: 'Programación Orientada a Objetos',
-      description: 'Terminar Taller: Crear una herencia y polimorfismo', 
-      dueDate: DateTime.now().add(const Duration(days: 2)), 
-      priority: 'Alta'
-      ),
-
-      Task(
-        title: 'Física', 
-        description: 'Realizar ejercicios de calculo de péndulo', 
-        dueDate: DateTime.now().add(const Duration(days: 8)), 
-        priority: 'Baja'
-        ),
-
-      Task(
-        title: 'Ética', 
-        description: 'Realizar informe de Propuesta de Solucion', 
-        dueDate: DateTime.now().add(const Duration(days: 6)), 
-        priority: 'Alta'
-        )
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mis Tareas'),
+  void _confirmDelete(BuildContext context, Task2 task) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Eliminar tarea'),
+        content: Text('¿Eliminar "${task.title}"?'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.calendar_month), 
-            tooltip: 'Ver Calendario',
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar')),
+          TextButton(
             onPressed: () {
-              Navigator.pushNamed(context, '/calendar');
+              Navigator.pop(context);
+              context.read<TaskViewModel>().deleteTask(task.id);
             },
-          ),
-
-          IconButton(
-            icon: const Icon(Icons.info), 
-            tooltip: 'Acerca de',
-            onPressed: () {
-              Navigator.pushNamed(context, '/about');
-            },
-          ),
-
-          IconButton(
-            icon: const Icon(Icons.person),
-            tooltip: 'Mi Perfil',
-            onPressed: () => Navigator.pushNamed(context, '/profile'),
-          ),
-
-          IconButton(
-            icon: const Icon(Icons.help),
-            tooltip: 'Ayuda',
-            onPressed: () => Navigator.pushNamed(context, '/help'),
+            child:
+                const Text('Eliminar', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
+    );
+  }
 
-      body: ListView.builder(
-        itemBuilder: (context, index) {
+  @override
+  Widget build(BuildContext context) {
+    final vm = context.watch<TaskViewModel>();
 
-          final task = listMaqueta[index];
-          return GestureDetector(
-            onTap: (){
-              Navigator.pushNamed(
-                context,
-                '/task-detail',
-                arguments: task,
-              );
-            },
-
-            child: TaskCard(task: task),
-          );
-        },
-        itemCount: listMaqueta.length,
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Mis Tareas'),
+          centerTitle: true,
+          bottom: const TabBar(
+            tabs: [
+              Tab(icon: Icon(Icons.pending_actions), text: 'Pendientes'),
+              Tab(icon: Icon(Icons.check_circle), text: 'Completadas'),
+            ],
+          ),
+        ),
+        body: vm.isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : TabBarView(
+                children: [
+                  // Pendientes
+                  _TaskList(
+                    tasks: vm.pendingTasks,
+                    emptyMessage: 'No tienes tareas pendientes 🎉',
+                    emptyIcon: Icons.check_circle_outline,
+                    vm: vm,
+                    onEdit: (t) => _openEditTask(context, t),
+                    onDelete: (t) => _confirmDelete(context, t),
+                  ),
+                  // Completadas
+                  _TaskList(
+                    tasks: vm.completedTasks,
+                    emptyMessage: 'Aún no has completado tareas',
+                    emptyIcon: Icons.hourglass_empty,
+                    vm: vm,
+                    onEdit: (t) => _openEditTask(context, t),
+                    onDelete: (t) => _confirmDelete(context, t),
+                  ),
+                ],
+              ),
+                floatingActionButton: FloatingActionButton.extended(
+          onPressed: () {
+            final vm = context.read<TaskViewModel>();
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+              builder: (_) => ChangeNotifierProvider.value(
+                value: vm,
+                child: const AddEditTaskSheet(),
+              ),
+            );
+          },
+          icon: const Icon(Icons.add),
+          label: const Text('Nueva tarea'),
+        ),
+        bottomNavigationBar: const BottomNav(currentIndex: 1),
       ),
+    );
+  }
+}
 
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Agregar Nueva Tarea')),
-          );
-        },
-        
-        child: const Icon(Icons.add),
-      ),
+class _TaskList extends StatelessWidget {
+  final List<Task2> tasks;
+  final String emptyMessage;
+  final IconData emptyIcon;
+  final TaskViewModel vm;
+  final void Function(Task2) onEdit;
+  final void Function(Task2) onDelete;
+
+  const _TaskList({
+    required this.tasks,
+    required this.emptyMessage,
+    required this.emptyIcon,
+    required this.vm,
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (tasks.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(emptyIcon,
+                size: 72,
+                color: Theme.of(context)
+                    .colorScheme
+                    .primary
+                    .withValues(alpha: 0.3)),
+            const SizedBox(height: 16),
+            Text(emptyMessage,
+                style: Theme.of(context).textTheme.bodyLarge),
+          ],
+        ),
+      );
+    }
+    return ListView.builder(
+      itemCount: tasks.length,
+      padding: const EdgeInsets.only(top: 8, bottom: 80),
+      itemBuilder: (_, i) {
+        final task = tasks[i];
+        return TaskCard(
+          task: task,
+          onToggleComplete: () => vm.toggleComplete(task),
+          onEdit: () => onEdit(task),
+          onDelete: () => onDelete(task),
+        );
+      },
     );
   }
 }

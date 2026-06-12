@@ -47,8 +47,8 @@ class Task2 {
   factory Task2.fromMap(Map<String, dynamic> map) {
     return Task2(
       id: map['id'] as String,
-      title: map['title'] as String,
-      description: map['description'] as String,
+      title: map['title'] as String? ?? 'Sin título',
+      description: map['description'] as String? ?? '',
       dueDate: DateTime.parse(map['dueDate'] as String),
       completed: map['completed'] as bool? ?? false,
       reminderHours: map['reminderHours'] as int? ?? 24,

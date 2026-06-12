@@ -12,10 +12,13 @@ class HiveDatasource {
   }
 
   Future<List<Task2>> getAllTasks() async {
-    return _box.values
-        .map((e) => Task2.fromMap(Map<String, dynamic>.from(e as Map)))
+    final list = _box.values
+        .map((e) => Map<String, dynamic>.from(e as Map))
+        .where((map) => map['id'] != null && map['dueDate'] != null)
+        .map((map) => Task2.fromMap(map))
         .toList()
       ..sort((a, b) => a.dueDate.compareTo(b.dueDate));
+    return list;
   }
 
   Future<void> updateTask(Task2 task) async {

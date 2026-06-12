@@ -54,23 +54,13 @@ class TaskViewModel extends ChangeNotifier {
   Future<bool> addTask(Task2 task) async {
     try {
       await createTaskUseCase.execute(task);
-      await loadTasks();
-      return true;
-    } catch (e) {
-      errorMessage = 'Error al guardar: $e';
+      print('=== VM: tarea guardada, recargando... ===');
+      _tasks = await getTasksUseCase.execute();
+      print('=== VM: _tasks después de recargar: ${_tasks.length} ===');
       notifyListeners();
-      return false;
-    }
-  }
-
-  Future<bool> toggleComplete(Task2 task) async {
-    try {
-      final updated = task.copyWith(completed: !task.completed);
-      await updateTaskUseCase.execute(updated);
-      await loadTasks();
       return true;
     } catch (e) {
-      errorMessage = 'Error al actualizar: $e';
+      print('=== ERROR: $e ===');
       notifyListeners();
       return false;
     }
@@ -79,7 +69,9 @@ class TaskViewModel extends ChangeNotifier {
   Future<bool> editTask(Task2 task) async {
     try {
       await updateTaskUseCase.execute(task);
-      await loadTasks();
+      _tasks = await getTasksUseCase.execute(); // recarga directa
+      errorMessage = null;
+      notifyListeners();
       return true;
     } catch (e) {
       errorMessage = 'Error al editar: $e';
@@ -91,10 +83,27 @@ class TaskViewModel extends ChangeNotifier {
   Future<bool> deleteTask(String id) async {
     try {
       await deleteTaskUseCase.execute(id);
-      await loadTasks();
+      _tasks = await getTasksUseCase.execute(); // recarga directa
+      errorMessage = null;
+      notifyListeners();
       return true;
     } catch (e) {
       errorMessage = 'Error al eliminar: $e';
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> toggleComplete(Task2 task) async {
+    try {
+      final updated = task.copyWith(completed: !task.completed);
+      await updateTaskUseCase.execute(updated);
+      _tasks = await getTasksUseCase.execute(); // recarga directa
+      errorMessage = null;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      errorMessage = 'Error al actualizar: $e';
       notifyListeners();
       return false;
     }

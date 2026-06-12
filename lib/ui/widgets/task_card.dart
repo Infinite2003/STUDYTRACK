@@ -1,80 +1,126 @@
 import 'package:flutter/material.dart';
-import '../../models/task.dart';
+import '../../domain/task2.dart';
 
-class TaskCard extends StatelessWidget{
+class TaskCard extends StatelessWidget {
+  final Task2 task;
+  final VoidCallback onToggleComplete;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
 
-  final Task task;
-
-  
   const TaskCard({
-    Key?key,
-    required this.task
-    }) : super(key: key);
+    super.key,
+    required this.task,
+    required this.onToggleComplete,
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  Color _urgencyColor(BuildContext context) {
+    final diff = task.dueDate.difference(DateTime.now()).inHours;
+    if (task.completed) return Colors.green.shade300;
+    if (diff < 24) return Colors.red.shade400;
+    if (diff < 72) return Colors.orange.shade400;
+    return Theme.of(context).colorScheme.primary;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final urgency = _urgencyColor(context);
     return Card(
-      elevation: 4,
-      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: urgency.withOpacity(0.4), width: 1.5),
+      ),
+      child: ListTile(
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        leading: GestureDetector(
+          onTap: onToggleComplete,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: task.completed ? Colors.green : Colors.transparent,
+              border: Border.all(
+                color: task.completed ? Colors.green : urgency,
+                width: 2,
+              ),
+            ),
+            child: task.completed
+                ? const Icon(Icons.check, size: 16, color: Colors.white)
+                : null,
+          ),
+        ),
+        title: Text(
+          task.title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            decoration:
+                task.completed ? TextDecoration.lineThrough : null,
+            color: task.completed
+                ? Theme.of(context).colorScheme.onSurface.withOpacity(0.5)
+                : null,
+          ),
+        ),
+        subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Fila 1: Icono + Título + Prioridad
+            if (task.description.isNotEmpty)
+              Text(
+                task.description,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withOpacity(0.6),
+                ),
+              ),
+            const SizedBox(height: 4),
             Row(
               children: [
-                Icon(
-                  task.isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
-                  color: task.isCompleted ? Colors.green : Colors.grey,
-                  size: 24,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    task.title,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      decoration: task.isCompleted ? TextDecoration.lineThrough : null,
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: task.priority == 'Alta'
-                        ? Colors.red
-                        : task.priority == 'Media'
-                            ? Colors.orange
-                            : Colors.green,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    task.priority,
-                    style: const TextStyle(color: Colors.white, fontSize: 12),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            // Descripción
-            Text(task.description),
-            const SizedBox(height: 8),
-            // Fecha límite
-            Row(
-              children: [
-                const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
+                Icon(Icons.access_time, size: 12, color: urgency),
                 const SizedBox(width: 4),
                 Text(
-                  'Fecha Límite: ${task.dueDate.day}/${task.dueDate.month}/${task.dueDate.year}',
-                  style: const TextStyle(color: Colors.grey),
+                  _formatDate(task.dueDate),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: urgency,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),
           ],
         ),
+        trailing: PopupMenuButton<String>(
+          onSelected: (value) {
+            if (value == 'edit') onEdit();
+            if (value == 'delete') onDelete();
+          },
+          itemBuilder: (_) => const [
+            PopupMenuItem(value: 'edit', child: Text('Editar')),
+            PopupMenuItem(
+              value: 'delete',
+              child: Text('Eliminar',
+                  style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  String _formatDate(DateTime date) {
+    const months = [
+      '', 'ene', 'feb', 'mar', 'abr', 'may', 'jun',
+      'jul', 'ago', 'sep', 'oct', 'nov', 'dic'
+    ];
+    return '${date.day} ${months[date.month]} ${date.year}  ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
   }
 }
