@@ -245,6 +245,27 @@ Esto permite que el usuario pueda moverse libremente entre secciones sin seguir 
 - Manejo de estado avanzado (Provider, Riverpod, BLoC)
 
 
+## Identidad Digital
+
+### Package Name
+
+cl.Pereira.STUDYTRACK
+
+### App Icon
+
+El proyecto utiliza un icono personalizado representativo de la gestión académica y organización de tareas.
+
+### Paleta de Colores
+
+| Color | Uso |
+|---------|---------|
+| Primario | Navegación principal |
+| Secundario | Botones de acción |
+| Fondo | Pantallas |
+| Acento | Indicadores visuales |
+
+La paleta fue definida utilizando Material Theme Builder para mantener consistencia visual en toda la aplicación.
+
 ## Arquitectura MVVM e Inyección de Dependencias
 
 ### Implementación MVVM
@@ -390,7 +411,68 @@ Encuesta de 8 preguntas (escala 1–5) cargada desde `assets/questions.json` y p
 | Participantes Digital Workspace Mobility | 2 |
 | Conocedores de la industria | 2 |
 | Externos a la industria | 2 |
-| **Total** | **10** |
+| **Total** | **6** |
+
+
+### Resultados Obtenidos
+
+Se recopilaron 6 evaluaciones completas utilizando la encuesta integrada en la aplicación.
+
+| Usuario | Puntaje |
+|----------|----------|
+| Usuario 1 | 39 / 40 |
+| Usuario 2 | 36 / 40 |
+| Usuario 3 | 38 / 40 |
+| Usuario 4 | 40 / 40 |
+| Usuario 5 | 37 / 40 |
+| Usuario 6 | 33 / 40 |
+
+Promedio General: 37,17 / 40
+
+Porcentaje de satisfacción: 92,9%
+
+### Análisis Ejecutivo
+
+Los resultados obtenidos evidencian una alta aceptación de StudyTrack por parte de los usuarios participantes. La aplicación alcanzó un promedio de 37,17 puntos sobre un máximo de 40, equivalente a un 92,9% de satisfacción general.
+
+#### ¿Qué funcionó correctamente?
+
+Las funcionalidades mejor evaluadas fueron:
+
+- Registro y gestión de tareas.
+
+- Visualización de actividades mediante calendario.
+
+- Funcionamiento sin conexión a internet.
+
+- Claridad y simplicidad de la interfaz.
+
+- Facilidad de navegación entre pantallas.
+
+Los usuarios destacaron especialmente la facilidad para organizar actividades académicas y la posibilidad de acceder a la información incluso sin conexión a internet.
+
+#### ¿Qué aspectos presentaron oportunidades de mejora?
+
+Aunque no se detectaron fallas críticas o errores, algunas respuestas mostraron puntuaciones inferiores en:
+
+- Utilidad de las notificaciones de recordatorio.
+
+- Recomendación de la aplicación a otros estudiantes.
+
+- Satisfacción general en algunos evaluadores.
+
+Esto sugiere que existen oportunidades para mejorar la personalización de recordatorios y ampliar las funcionalidades disponibles para el usuario.
+
+### Technical Debt y Trabajos Futuros
+
+Como resultado del proceso de Beta Testing se identificaron las siguientes mejoras para una futura iteración:
+
+- Implementar categorías o etiquetas para organizar tareas por asignatura.
+
+- Mejorar la configuración y personalización de las notificaciones.
+
+- Incorporar estadísticas de productividad y seguimiento académico.
+
 
 ## Material de Apoyo
 
