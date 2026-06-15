@@ -19,9 +19,25 @@ import 'ui/screens/tasks_screen.dart';
 import 'ui/screens/about_screen.dart';
 import 'survey/survey_screen.dart';
 import 'theme/material_theme.dart';
+import 'package:timezone/data/latest.dart' as tz_data;
+import 'package:timezone/timezone.dart' as tz;
+import 'package:flutter_timezone/flutter_timezone.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  tz_data.initializeTimeZones();
+  // Obtener el offset actual del dispositivo y encontrar la zona
+  final offsetMs = DateTime.now().timeZoneOffset.inMilliseconds;
+  tz.Location localLoc = tz.UTC;
+  for (final loc in tz.timeZoneDatabase.locations.values) {
+    if (loc.currentTimeZone.offset == offsetMs) {
+      localLoc = loc;
+      break;
+    }
+  }
+  tz.setLocalLocation(localLoc);
+  print('=== Zona detectada: ${localLoc.name} ===');
 
   await Hive.initFlutter();
   await Hive.openBox(HiveDatasource.boxName);

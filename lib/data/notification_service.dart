@@ -1,4 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz_data;
 import '../domain/task2.dart';
 
 class NotificationService {
@@ -10,6 +13,9 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   Future<void> init() async {
+
+    tz_data.initializeTimeZones();
+
     const AndroidInitializationSettings androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
@@ -24,6 +30,7 @@ class NotificationService {
 
     if (androidImpl != null) {
       await androidImpl.requestNotificationsPermission();
+      await androidImpl.requestExactAlarmsPermission();
     }
   }
 
@@ -31,7 +38,10 @@ class NotificationService {
     final scheduledTime =
         task.dueDate.subtract(Duration(hours: task.reminderHours));
 
-    if (scheduledTime.isBefore(DateTime.now())) return;
+    if (scheduledTime.isBefore(DateTime.now())) {
+      print('=== NOTIF: fecha ya pasó ===');
+      return;
+    }
 
     const AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
@@ -44,14 +54,27 @@ class NotificationService {
 
     final int notifId = task.id.hashCode.abs() % 100000;
 
-    await _plugin.show(
-      id: notifId,
-      title: 'Recordatorio: ${task.title}',
-      body: 'Vence el ${_formatDate(task.dueDate)}',
-      notificationDetails: const NotificationDetails(android: androidDetails),
+    final tz.TZDateTime tzScheduled = tz.TZDateTime.from(
+      scheduledTime,
+      tz.local,
     );
-  }
 
+    print('=== NOTIF: programando para $tzScheduled ===');
+
+    try {
+      await _plugin.zonedSchedule(
+        id: notifId,
+        title: '📚 Recordatorio: ${task.title}',
+        body: 'Vence el ${_formatDate(task.dueDate)}',
+        scheduledDate: tzScheduled,
+        notificationDetails: const NotificationDetails(android: androidDetails),
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      );
+      print('=== NOTIF: zonedSchedule OK ===');
+    } catch (e) {
+      print('=== NOTIF ERROR: $e ===');
+    }
+  }
   Future<void> cancelTaskNotification(String taskId) async {
     final int notifId = taskId.hashCode.abs() % 100000;
     await _plugin.cancel(id: notifId);

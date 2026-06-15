@@ -204,7 +204,7 @@ class _AddEditTaskSheetState extends State<AddEditTaskSheet> {
             ),
             Slider(
               value: _reminderHours.toDouble(),
-              min: 1,
+              min: 0,
               max: 72,
               divisions: 71,
               label: '$_reminderHours h',
