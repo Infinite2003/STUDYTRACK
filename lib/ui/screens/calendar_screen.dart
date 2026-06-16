@@ -188,6 +188,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           final task = tasksSelected[i];
                           return TaskCard(
                             task: task,
+                            sortBy: prefs.sortBy,
                             onToggleComplete: () => vm.toggleComplete(task),
                             onEdit: () => _openEditTask(task),
                             onDelete: () => _confirmDelete(context, task),
@@ -197,10 +198,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: _openAddTask,
-        icon: const Icon(Icons.add),
-        label: const Text('Nueva tarea'),
+        child: const Icon(Icons.add),
       ),
       bottomNavigationBar: const BottomNav(currentIndex: 0),
     );

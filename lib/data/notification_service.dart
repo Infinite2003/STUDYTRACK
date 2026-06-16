@@ -68,7 +68,7 @@ class NotificationService {
         body: 'Vence el ${_formatDate(task.dueDate)}',
         scheduledDate: tzScheduled,
         notificationDetails: const NotificationDetails(android: androidDetails),
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       );
       print('=== NOTIF: zonedSchedule OK ===');
     } catch (e) {

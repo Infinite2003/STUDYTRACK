@@ -60,6 +60,8 @@ void main() async {
     notificationService: notificationService,
   );
 
+  await notificationService.init();
+
   runApp(MyApp(repository: repository));
 }
 

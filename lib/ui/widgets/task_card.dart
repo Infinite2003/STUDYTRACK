@@ -7,6 +7,7 @@ class TaskCard extends StatelessWidget {
   final VoidCallback onToggleComplete;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
+  final String sortBy;
 
   const TaskCard({
     super.key,
@@ -14,6 +15,7 @@ class TaskCard extends StatelessWidget {
     required this.onToggleComplete,
     required this.onEdit,
     required this.onDelete,
+    required this.sortBy,
   });
 
   Color _urgencyColor(BuildContext context) {
@@ -76,19 +78,17 @@ class TaskCard extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withOpacity(0.6),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
               ),
             const SizedBox(height: 4),
+            // Fecha límite — siempre visible
             Row(
               children: [
                 Icon(Icons.access_time, size: 12, color: urgency),
                 const SizedBox(width: 4),
                 Text(
-                  _formatDate(task.dueDate),
+                  'Vence: ${_formatDate(task.dueDate)}',
                   style: TextStyle(
                     fontSize: 12,
                     color: urgency,
@@ -97,6 +97,24 @@ class TaskCard extends StatelessWidget {
                 ),
               ],
             ),
+            // Fecha de creación — solo visible cuando sortBy == 'creation'
+            if (sortBy == 'creation') ...[
+              const SizedBox(height: 2),
+              Row(
+                children: [
+                  Icon(Icons.edit_calendar, size: 12,
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Creada: ${_formatDate(DateTime.fromMillisecondsSinceEpoch(int.parse(task.id)))}',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ],
         ),
         trailing: PopupMenuButton<String>(

@@ -71,9 +71,10 @@ class TasksScreen extends StatelessWidget {
                 children: [
                   _TaskList(
                     tasks: vm.sortedPending(prefs.sortBy),
-                    emptyMessage: 'No tienes tareas pendientes 🎉',
+                    emptyMessage: 'No tienes tareas pendientes',
                     emptyIcon: Icons.check_circle_outline,
                     vm: vm,
+                    sortBy: prefs.sortBy,
                     onEdit: (t) => _openEditTask(context, t),
                     onDelete: (t) => _confirmDelete(context, t),
                   ),
@@ -82,12 +83,13 @@ class TasksScreen extends StatelessWidget {
                     emptyMessage: 'Aún no has completado tareas',
                     emptyIcon: Icons.hourglass_empty,
                     vm: vm,
+                    sortBy: prefs.sortBy,
                     onEdit: (t) => _openEditTask(context, t),
                     onDelete: (t) => _confirmDelete(context, t),
                   ),
                 ],
               ),
-        floatingActionButton: FloatingActionButton.extended(
+        floatingActionButton: FloatingActionButton(
           onPressed: () {
             final vm = context.read<TaskViewModel>();
             showModalBottomSheet(
@@ -102,8 +104,7 @@ class TasksScreen extends StatelessWidget {
               ),
             );
           },
-          icon: const Icon(Icons.add),
-          label: const Text('Nueva tarea'),
+          child: const Icon(Icons.add),
         ),
         bottomNavigationBar: const BottomNav(currentIndex: 1),
       ),
@@ -116,6 +117,7 @@ class _TaskList extends StatelessWidget {
   final String emptyMessage;
   final IconData emptyIcon;
   final TaskViewModel vm;
+  final String sortBy;
   final void Function(Task2) onEdit;
   final void Function(Task2) onDelete;
 
@@ -124,6 +126,7 @@ class _TaskList extends StatelessWidget {
     required this.emptyMessage,
     required this.emptyIcon,
     required this.vm,
+    required this.sortBy,
     required this.onEdit,
     required this.onDelete,
   });
@@ -154,6 +157,7 @@ class _TaskList extends StatelessWidget {
         final task = tasks[i];
         return TaskCard(
           task: task,
+          sortBy: sortBy,
           onToggleComplete: () => vm.toggleComplete(task),
           onEdit: () => onEdit(task),
           onDelete: () => onDelete(task),
