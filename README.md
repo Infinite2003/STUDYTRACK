@@ -408,70 +408,71 @@ Encuesta de 8 preguntas (escala 1–5) cargada desde `assets/questions.json` y p
 
 | Tipo | Cantidad |
 |------|----------|
-| Participantes Digital Workspace Mobility | 2 |
+| Participantes Digital Workspace Mobility | 6 |
 | Conocedores de la industria | 2 |
 | Externos a la industria | 2 |
-| **Total** | **6** |
-
+| Usuarios adicionales | 3 |
+| **Total** | **13** |
 
 ### Resultados Obtenidos
 
-Se recopilaron 6 evaluaciones completas utilizando la encuesta integrada en la aplicación.
+Se recopilaron 13 evaluaciones completas utilizando la encuesta integrada en la aplicación.
 
-| Usuario | Puntaje |
-|----------|----------|
-| Usuario 1 | 39 / 40 |
-| Usuario 2 | 36 / 40 |
-| Usuario 3 | 38 / 40 |
-| Usuario 4 | 40 / 40 |
-| Usuario 5 | 37 / 40 |
-| Usuario 6 | 33 / 40 |
+| Usuario | Nav. | Gestión | Interfaz | Calendario | Notif. | Recomend. | Offline | Satisf. | **Total** |
+|---------|------|---------|----------|------------|--------|-----------|---------|---------|-----------|
+| U-01 | 5 | 5 | 5 | 5 | 5 | 4 | 5 | 5 | **39/40** |
+| U-02 | 4 | 4 | 5 | 5 | 5 | 5 | 4 | 4 | **36/40** |
+| U-03 | 5 | 5 | 5 | 5 | 3 | 5 | 5 | 5 | **38/40** |
+| U-04 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | **40/40** |
+| U-05 | 5 | 4 | 5 | 4 | 4 | 5 | 5 | 5 | **37/40** |
+| U-06 | 4 | 4 | 4 | 4 | 5 | 4 | 5 | 3 | **33/40** |
+| U-07 | 5 | 5 | 4 | 4 | 5 | 5 | 5 | 5 | **38/40** |
+| U-08 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | **40/40** |
+| U-09 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | **40/40** |
+| U-10 | 4 | 5 | 4 | 5 | 5 | 4 | 5 | 5 | **37/40** |
+| U-11 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | **40/40** |
+| U-12 | 5 | 5 | 5 | 5 | 5 | 4 | 5 | 5 | **39/40** |
+| U-13 | 4 | 5 | 5 | 5 | 5 | 4 | 4 | 4 | **36/40** |
+| **Promedio** | **4.69** | **4.77** | **4.77** | **4.77** | **4.77** | **4.62** | **4.85** | **4.69** | **38.69/40** |
 
-Promedio General: 37,17 / 40
+**Promedio general: 38.69 / 40 · Satisfacción: 96.7%**
 
-Porcentaje de satisfacción: 92,9%
+### Análisis por pregunta
+
+| Dimensión | Promedio | Observación |
+|-----------|----------|-------------|
+| Navegación | 4.69 / 5 | Interfaz intuitiva y fácil de recorrer |
+| Gestión de tareas | 4.77 / 5 | CRUD sin errores reportados |
+| Interfaz gráfica | 4.77 / 5 | Diseño atractivo y coherente |
+| Calendario | 4.77 / 5 | Visualización de carga académica efectiva |
+| Notificaciones | 4.77 / 5 | Un usuario evaluó con 3 — pendiente mejorar configuración |
+| Recomendación | 4.62 / 5 | Dimensión con menor puntaje — potencial de mejora en difusión |
+| Funcionamiento offline | 4.85 / 5 | Resultado más alto — persistencia Hive validada |
+| Satisfacción general | 4.69 / 5 | Alta aceptación general |
 
 ### Análisis Ejecutivo
 
-Los resultados obtenidos evidencian una alta aceptación de StudyTrack por parte de los usuarios participantes. La aplicación alcanzó un promedio de 37,17 puntos sobre un máximo de 40, equivalente a un 92,9% de satisfacción general.
+Los resultados evidencian una **alta aceptación de StudyTrack** por parte de los 13 usuarios participantes. La aplicación alcanzó un promedio de **38.69 puntos sobre 40**, equivalente a un **96.7% de satisfacción general**, superando significativamente el resultado de la primera ronda de evaluaciones.
 
-#### ¿Qué funcionó correctamente?
+#### Qué funcionó correctamente
 
-Las funcionalidades mejor evaluadas fueron:
+- **Funcionamiento offline** obtuvo el puntaje más alto (4.85/5) — la persistencia con Hive fue validada exitosamente por todos los usuarios.
+- **Gestión de tareas, interfaz y calendario** obtuvieron 4.77/5 — el CRUD completo funcionó sin errores reportados.
+- **4 usuarios otorgaron puntaje perfecto** (40/40), indicando una experiencia sin fricciones.
+- La navegación mediante NavigationBar inferior fue calificada como intuitiva por la mayoría.
 
-- Registro y gestión de tareas.
+#### Qué mejorar
 
-- Visualización de actividades mediante calendario.
-
-- Funcionamiento sin conexión a internet.
-
-- Claridad y simplicidad de la interfaz.
-
-- Facilidad de navegación entre pantallas.
-
-Los usuarios destacaron especialmente la facilidad para organizar actividades académicas y la posibilidad de acceder a la información incluso sin conexión a internet.
-
-#### ¿Qué aspectos presentaron oportunidades de mejora?
-
-Aunque no se detectaron fallas críticas o errores, algunas respuestas mostraron puntuaciones inferiores en:
-
-- Utilidad de las notificaciones de recordatorio.
-
-- Recomendación de la aplicación a otros estudiantes.
-
-- Satisfacción general en algunos evaluadores.
-
-Esto sugiere que existen oportunidades para mejorar la personalización de recordatorios y ampliar las funcionalidades disponibles para el usuario.
+- **Notificaciones** (4.77/5) — un usuario evaluó con 3/5, indicando que la experiencia de los recordatorios puede mejorarse. 
+- **Recomendación** (4.62/5) — la dimensión con menor puntaje. Esto sugiere que la aplicación aún tiene margen de mejora. 
 
 ### Technical Debt y Trabajos Futuros
 
-Como resultado del proceso de Beta Testing se identificaron las siguientes mejoras para una futura iteración:
-
-- Implementar categorías o etiquetas para organizar tareas por asignatura.
-
-- Mejorar la configuración y personalización de las notificaciones.
-
-- Incorporar estadísticas de productividad y seguimiento académico.
+| Prioridad | Mejora | Origen |
+|-----------|--------|--------|
+| Alta | Notificaciones con más opciones de personalización | Evaluación notificaciones |
+| Alta | Sincronización Firebase Firestore | ADR / deuda técnica |
+| Media | Categorías o etiquetas por asignatura | Feedback usuarios |
 
 
 ## Material de Apoyo
