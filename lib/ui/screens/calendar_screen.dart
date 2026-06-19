@@ -89,6 +89,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
         title: const Text('StudyTrack'),
         centerTitle: true,
         actions: [
+
+          IconButton(
+            icon: const Icon(Icons.person),
+            tooltip: 'Mi Perfil',
+            onPressed: () => Navigator.pushNamed(context, '/profile'),
+          ),
           IconButton(
             icon: const Icon(Icons.settings),
             tooltip: 'Preferencias',

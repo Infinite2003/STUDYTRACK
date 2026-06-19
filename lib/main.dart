@@ -17,6 +17,7 @@ import 'presentation/preferences/preferences_screen.dart';
 import 'ui/screens/calendar_screen.dart';
 import 'ui/screens/tasks_screen.dart';
 import 'ui/screens/about_screen.dart';
+import 'ui/screens/profile_screen.dart';
 import 'survey/survey_screen.dart';
 import 'theme/material_theme.dart';
 import 'package:timezone/data/latest.dart' as tz_data;
@@ -105,6 +106,7 @@ class MyApp extends StatelessWidget {
               '/about': (_) => const AboutScreen(),
               '/preferences': (_) => const PreferencesScreen(),
               '/survey': (_) => const SurveyScreen(),
+              '/profile': (_) => const ProfileScreen(),
             },
           );
         },
