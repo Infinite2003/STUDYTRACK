@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_localizations.dart';
 import 'preferences_provider.dart';
 
 class PreferencesScreen extends StatefulWidget {
@@ -21,27 +22,28 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
   @override
   Widget build(BuildContext context) {
     final prefs = context.watch<PreferencesProvider>();
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Preferencias'),
+        title: Text(l10n.preferences),
         centerTitle: true,
       ),
       body: ListView(
         children: [
-          // ── NOTIFICACIONES ──────────────────────────
-          _SectionHeader('Notificaciones'),
+          // ── NOTIFICACIONES ──
+          _SectionHeader(l10n.sectionNotifications),
           SwitchListTile(
-            title: const Text('Notificaciones activadas'),
-            subtitle: const Text('Recibir recordatorios de tareas'),
+            title: Text(l10n.notificationsEnabled),
+            subtitle: Text(l10n.notificationsSubtitle),
             secondary: const Icon(Icons.notifications),
             value: prefs.notificationsEnabled,
             onChanged: prefs.setNotifications,
           ),
           ListTile(
             leading: const Icon(Icons.alarm),
-            title: const Text('Anticipación del recordatorio'),
-            subtitle: Text('${prefs.reminderHours} horas antes del vencimiento'),
+            title: Text(l10n.reminderAnticipation),
+            subtitle: Text(l10n.reminderAnticipationSubtitle(prefs.reminderHours)),
           ),
           Slider(
             min: 1,
@@ -54,18 +56,18 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
 
           const Divider(),
 
-          // ── CALENDARIO ──────────────────────────────
-          _SectionHeader('Calendario'),
+          // ── CALENDARIO ──
+          _SectionHeader(l10n.sectionCalendar),
           SwitchListTile(
-            title: const Text('Semana empieza el lunes'),
-            subtitle: const Text('Afecta la vista del calendario'),
+            title: Text(l10n.weekStartsMonday),
+            subtitle: Text(l10n.weekStartsMondaySubtitle),
             secondary: const Icon(Icons.calendar_month),
             value: prefs.startOnMonday,
             onChanged: prefs.setStartOnMonday,
           ),
           SwitchListTile(
-            title: const Text('Mostrar tareas completadas'),
-            subtitle: const Text('Incluir completadas en el calendario'),
+            title: Text(l10n.showCompleted),
+            subtitle: Text(l10n.showCompletedSubtitle),
             secondary: const Icon(Icons.check_circle_outline),
             value: prefs.showCompletedInCalendar,
             onChanged: prefs.setShowCompletedInCalendar,
@@ -73,24 +75,24 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
 
           const Divider(),
 
-          // ── TAREAS ──────────────────────────────────
-          _SectionHeader('Tareas'),
+          // ── TAREAS ──
+          _SectionHeader(l10n.sectionTasks),
           ListTile(
             leading: const Icon(Icons.sort),
-            title: const Text('Ordenar tareas por'),
+            title: Text(l10n.sortBy),
             subtitle: Text(
-              prefs.sortBy == 'date' ? 'Fecha límite' : 'Fecha de creación',
+              prefs.sortBy == 'date' ? l10n.sortByDate : l10n.sortByCreation,
             ),
           ),
           RadioListTile<String>(
-            title: const Text('Fecha límite'),
+            title: Text(l10n.sortByDate),
             secondary: const Icon(Icons.event),
             value: 'date',
             groupValue: prefs.sortBy,
             onChanged: (v) => prefs.setSortBy(v!),
           ),
           RadioListTile<String>(
-            title: const Text('Fecha de creación'),
+            title: Text(l10n.sortByCreation),
             secondary: const Icon(Icons.add_circle_outline),
             value: 'creation',
             groupValue: prefs.sortBy,
@@ -99,20 +101,39 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
 
           const Divider(),
 
-          // ── APARIENCIA (secundario) ─────────────────
-          _SectionHeader('Apariencia'),
+          // ── APARIENCIA ──
+          _SectionHeader(l10n.sectionAppearance),
           SwitchListTile(
-            title: const Text('Modo oscuro'),
+            title: Text(l10n.darkMode),
             secondary: const Icon(Icons.dark_mode),
             value: prefs.darkMode,
             onChanged: prefs.setDarkMode,
+          ),
+
+          const Divider(),
+
+          // ── IDIOMA ──
+          _SectionHeader(l10n.sectionLanguage),
+          RadioListTile<String>(
+            title: const Text('Español'),
+            secondary: const Text('🇨🇱'),
+            value: 'es',
+            groupValue: prefs.locale.languageCode,
+            onChanged: (v) => prefs.setLocale(v!),
+          ),
+          RadioListTile<String>(
+            title: const Text('English'),
+            secondary: const Text('🇺🇸'),
+            value: 'en',
+            groupValue: prefs.locale.languageCode,
+            onChanged: (v) => prefs.setLocale(v!),
           ),
 
           const SizedBox(height: 24),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
-              'Las preferencias se guardan automáticamente.',
+              l10n.preferencesAutoSave,
               style: Theme.of(context).textTheme.bodySmall,
               textAlign: TextAlign.center,
             ),

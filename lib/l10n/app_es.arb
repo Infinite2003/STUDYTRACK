@@ -1,0 +1,120 @@
+{
+  "@@locale": "es",
+
+  "appTitle": "StudyTrack",
+  "calendar": "Calendario",
+  "tasks": "Tareas",
+  "about": "Acerca de",
+  "preferences": "Preferencias",
+  "profile": "Mi Perfil",
+  "survey": "Evaluación",
+
+  "newTask": "Nueva tarea",
+  "editTask": "Editar tarea",
+  "createTask": "Crear tarea",
+  "saveChanges": "Guardar cambios",
+  "deleteTask": "Eliminar tarea",
+  "confirmDelete": "¿Eliminar \"{title}\"?",
+  "@confirmDelete": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+  "cancel": "Cancelar",
+  "delete": "Eliminar",
+  "taskCreated": "✅ Tarea creada",
+  "taskUpdated": "✅ Tarea actualizada",
+
+  "titleField": "Título *",
+  "titleRequired": "Ingresa un título",
+  "descriptionField": "Descripción (opcional)",
+  "dueDate": "Fecha límite",
+  "reminder": "Recordatorio",
+  "hoursBeforeReminder": "{hours} horas antes",
+  "@hoursBeforeReminder": {
+    "placeholders": {
+      "hours": { "type": "int" }
+    }
+  },
+
+  "pending": "Pendientes",
+  "completed": "Completadas",
+  "noPendingTasks": "No tienes tareas pendientes 🎉",
+  "noCompletedTasks": "Aún no has completado tareas",
+  "noTasksForDay": "No hay tareas para este día",
+  "noTasksThisDay": "Sin tareas este día",
+  "taskCount": "{count} tarea(s)",
+  "@taskCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "notificationsEnabled": "Notificaciones activadas",
+  "notificationsSubtitle": "Recibir recordatorios de tareas",
+  "reminderAnticipation": "Anticipación del recordatorio",
+  "reminderAnticipationSubtitle": "{hours} horas antes del vencimiento",
+  "@reminderAnticipationSubtitle": {
+    "placeholders": {
+      "hours": { "type": "int" }
+    }
+  },
+  "weekStartsMonday": "Semana empieza el lunes",
+  "weekStartsMondaySubtitle": "Afecta la vista del calendario",
+  "showCompleted": "Mostrar tareas completadas",
+  "showCompletedSubtitle": "Incluir completadas en el calendario",
+  "sortBy": "Ordenar tareas por",
+  "sortByDate": "Fecha límite",
+  "sortByCreation": "Fecha de creación",
+  "darkMode": "Modo oscuro",
+  "language": "Idioma",
+  "preferencesAutoSave": "Las preferencias se guardan automáticamente.",
+
+  "sectionNotifications": "Notificaciones",
+  "sectionCalendar": "Calendario",
+  "sectionTasks": "Tareas",
+  "sectionAppearance": "Apariencia",
+  "sectionLanguage": "Idioma",
+
+  "aboutTitle": "Acerca de",
+  "aboutDescription": "StudyTrack es una aplicación móvil diseñada para estudiantes que buscan organizar su tiempo de estudio y evitar la sobrecarga académica.",
+  "aboutFeatures": "Características",
+  "aboutTechnologies": "Tecnologías",
+
+  "surveyTitle": "Evaluación STUDYTRACK",
+  "surveyProgress": "{answered} / {total} respondidas",
+  "@surveyProgress": {
+    "placeholders": {
+      "answered": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "surveySend": "Enviar evaluación por correo",
+  "surveyAnswerAll": "Responde todas las preguntas",
+  "surveyMinLabel": "{min} = Muy malo",
+  "@surveyMinLabel": {
+    "placeholders": {
+      "min": { "type": "int" }
+    }
+  },
+  "surveyMaxLabel": "{max} = Excelente",
+  "@surveyMaxLabel": {
+    "placeholders": {
+      "max": { "type": "int" }
+    }
+  },
+
+  "edit": "Editar",
+  "share": "Compartir",
+  "shareTaskText": "📚 Tarea: {title}\n📝 Descripción: {description}\n⏰ Vence: {dueDate}\n✅ Estado: {status}\n\nEnviado desde StudyTrack",
+  "@shareTaskText": {
+    "placeholders": {
+      "title": { "type": "String" },
+      "description": { "type": "String" },
+      "dueDate": { "type": "String" },
+      "status": { "type": "String" }
+    }
+  },
+  "statusCompleted": "Completada",
+  "statusPending": "Pendiente"
+}

@@ -24,26 +24,38 @@ import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter_timezone/flutter_timezone.dart';
 
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'l10n/app_localizations.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   tz_data.initializeTimeZones();
-  // Obtener el offset actual del dispositivo y encontrar la zona
   final offsetMs = DateTime.now().timeZoneOffset.inMilliseconds;
   tz.Location localLoc = tz.UTC;
-  for (final loc in tz.timeZoneDatabase.locations.values) {
-    if (loc.currentTimeZone.offset == offsetMs) {
-      localLoc = loc;
-      break;
+  const chileZones = ['America/Santiago', 'America/Punta_Arenas', 'Pacific/Easter'];
+  for (final zoneName in chileZones) {
+    try {
+      final loc = tz.getLocation(zoneName);
+      if (loc.currentTimeZone.offset == offsetMs) {
+        localLoc = loc;
+        break;
+      }
+    } catch (_) {}
+  }
+  if (localLoc == tz.UTC && offsetMs != 0) {
+    for (final loc in tz.timeZoneDatabase.locations.values) {
+      if (loc.currentTimeZone.offset == offsetMs) {
+        localLoc = loc;
+        break;
+      }
     }
   }
   tz.setLocalLocation(localLoc);
-  print('=== Zona detectada: ${localLoc.name} ===');
 
   await Hive.initFlutter();
   await Hive.openBox(HiveDatasource.boxName);
 
-  // Limpieza de registros legacy sin 'id'
   final box = Hive.box(HiveDatasource.boxName);
   final keysToDelete = box.keys.where((key) {
     final val = box.get(key);
@@ -52,7 +64,6 @@ void main() async {
   }).toList();
   await box.deleteAll(keysToDelete);
 
-  // A partir de aquí todo lo demás que ya tenías
   final notificationService = NotificationService();
   await notificationService.init();
 
@@ -61,10 +72,9 @@ void main() async {
     notificationService: notificationService,
   );
 
-  await notificationService.init();
-
   runApp(MyApp(repository: repository));
 }
+
 
 class MyApp extends StatelessWidget {
   final TaskRepositoryImpl repository;
@@ -92,10 +102,21 @@ class MyApp extends StatelessWidget {
       child: Consumer<PreferencesProvider>(
         builder: (context, prefs, _) {
           final theme = MaterialTheme(Theme.of(context).textTheme);
-
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'StudyTrack',
+            // i18n
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('es'),
+              Locale('en'),
+            ],
+            locale: prefs.locale,
             themeMode: prefs.darkMode ? ThemeMode.dark : ThemeMode.light,
             theme: theme.light(),
             darkTheme: theme.dark(),
