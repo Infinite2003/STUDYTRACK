@@ -22,13 +22,27 @@ import 'survey/survey_screen.dart';
 import 'theme/material_theme.dart';
 import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
-import 'package:flutter_timezone/flutter_timezone.dart';
+
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+    // Inicializar Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+    // Probar conexión con Firestore
+  await FirebaseFirestore.instance.collection('test').add({
+    'mensaje': 'Firebase conectado',
+    'fecha': DateTime.now(),
+  });
+
   tz_data.initializeTimeZones();
-  // Obtener el offset actual del dispositivo y encontrar la zona
   final offsetMs = DateTime.now().timeZoneOffset.inMilliseconds;
   tz.Location localLoc = tz.UTC;
   for (final loc in tz.timeZoneDatabase.locations.values) {
@@ -52,7 +66,6 @@ void main() async {
   }).toList();
   await box.deleteAll(keysToDelete);
 
-  // A partir de aquí todo lo demás que ya tenías
   final notificationService = NotificationService();
   await notificationService.init();
 

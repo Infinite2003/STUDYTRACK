@@ -34,7 +34,7 @@ class TaskCard extends StatelessWidget {
       elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: urgency.withOpacity(0.4), width: 1.5),
+        side: BorderSide(color: urgency.withValues(alpha: 0.4), width: 1.5),
       ),
       child: ListTile(
         contentPadding:
@@ -65,7 +65,7 @@ class TaskCard extends StatelessWidget {
             decoration:
                 task.completed ? TextDecoration.lineThrough : null,
             color: task.completed
-                ? Theme.of(context).colorScheme.onSurface.withOpacity(0.5)
+                ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)
                 : null,
           ),
         ),

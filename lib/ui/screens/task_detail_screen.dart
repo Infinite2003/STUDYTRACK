@@ -5,9 +5,9 @@ class TaskDetailScreen extends StatelessWidget {
   final Task task;
 
   const TaskDetailScreen({
-    Key? key,
+    super.key,
     required this.task,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +149,7 @@ class TaskDetailScreen extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, color: color, size: 28),

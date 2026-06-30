@@ -98,7 +98,7 @@ class SurveyScreen extends StatelessWidget {
                                   color: Theme.of(context)
                                       .colorScheme
                                       .primary
-                                      .withOpacity(0.5))
+                                      .withValues(alpha: 0.5))
                               : BorderSide.none,
                         ),
                         child: Padding(
@@ -119,7 +119,7 @@ class SurveyScreen extends StatelessWidget {
                                               .primary
                                           : Theme.of(context)
                                               .colorScheme
-                                              .surfaceVariant,
+                                              .surfaceContainerHighest,
                                     ),
                                     child: Center(
                                       child: Text(
@@ -175,7 +175,7 @@ class SurveyScreen extends StatelessWidget {
                                                   .primary
                                               : Theme.of(context)
                                                   .colorScheme
-                                                  .surfaceVariant,
+                                                  .surfaceContainerHighest,
                                         ),
                                         child: Center(
                                           child: Text(
