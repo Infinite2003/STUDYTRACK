@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
+import '../../l10n/app_localizations.dart';
 
 import '../../viewmodels/task_viewmodel.dart';
 import '../../domain/task2.dart';
@@ -48,21 +49,22 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   void _confirmDelete(BuildContext context, Task2 task) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Eliminar tarea'),
-        content: Text('¿Eliminar "${task.title}"?'),
+        title: Text(l10n.deleteTask),
+        content: Text(l10n.confirmDelete(task.title)),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancelar')),
+              child: Text(l10n.cancel)),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               context.read<TaskViewModel>().deleteTask(task.id);
             },
-            child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+            child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -73,6 +75,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget build(BuildContext context) {
     final vm = context.watch<TaskViewModel>();
     final prefs = context.watch<PreferencesProvider>();
+    final l10n = AppLocalizations.of(context)!;
 
     // Filtra según preferencia de mostrar completadas
     List<Task2> tasksForDay(DateTime day) {
@@ -86,23 +89,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('StudyTrack'),
+        title: Text(l10n.appTitle),
         centerTitle: true,
         actions: [
-
-          IconButton(
-            icon: const Icon(Icons.person),
-            tooltip: 'Mi Perfil',
-            onPressed: () => Navigator.pushNamed(context, '/profile'),
-          ),
           IconButton(
             icon: const Icon(Icons.settings),
-            tooltip: 'Preferencias',
+            tooltip: l10n.preferences,
             onPressed: () => Navigator.pushNamed(context, '/preferences'),
           ),
           IconButton(
             icon: const Icon(Icons.star_rate),
-            tooltip: 'Evaluar app',
+            tooltip: l10n.survey,
             onPressed: () => Navigator.pushNamed(context, '/survey'),
           ),
         ],
@@ -149,9 +146,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               setState(() => _focusedDay = focused);
             },
           ),
-
           const Divider(height: 1),
-
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
@@ -161,14 +156,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 const SizedBox(width: 8),
                 Text(
                   tasksSelected.isEmpty
-                      ? 'Sin tareas este día'
-                      : '${tasksSelected.length} tarea(s)',
+                      ? l10n.noTasksThisDay
+                      : l10n.taskCount(tasksSelected.length),
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
               ],
             ),
           ),
-
           Expanded(
             child: vm.isLoading
                 ? const Center(child: CircularProgressIndicator())
@@ -184,7 +178,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                     .primary
                                     .withValues(alpha: 0.3)),
                             const SizedBox(height: 12),
-                            const Text('No hay tareas para este día'),
+                            Text(l10n.noTasksForDay),
                           ],
                         ),
                       )
@@ -204,9 +198,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: _openAddTask,
-        child: const Icon(Icons.add),
+        icon: const Icon(Icons.add),
+        label: Text(l10n.newTask),
       ),
       bottomNavigationBar: const BottomNav(currentIndex: 0),
     );
@@ -219,18 +214,21 @@ class BottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return NavigationBar(
       selectedIndex: currentIndex,
       onDestinationSelected: (i) {
         if (i == 0) Navigator.pushReplacementNamed(context, '/calendar');
         if (i == 1) Navigator.pushReplacementNamed(context, '/tasks');
         if (i == 2) Navigator.pushReplacementNamed(context, '/about');
+        if (i == 3) Navigator.pushReplacementNamed(context, '/profile');
       },
-      destinations: const [
+      destinations: [
         NavigationDestination(
-            icon: Icon(Icons.calendar_month), label: 'Calendario'),
-        NavigationDestination(icon: Icon(Icons.task), label: 'Tareas'),
-        NavigationDestination(icon: Icon(Icons.info), label: 'Acerca de'),
+            icon: const Icon(Icons.calendar_month), label: l10n.calendar),
+        NavigationDestination(icon: const Icon(Icons.task), label: l10n.tasks),
+        NavigationDestination(icon: const Icon(Icons.info), label: l10n.about),
+        NavigationDestination(icon: const Icon(Icons.person), label: l10n.profile),
       ],
     );
   }

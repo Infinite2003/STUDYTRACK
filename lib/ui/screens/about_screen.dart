@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'calendar_screen.dart';
+import '../../l10n/app_localizations.dart';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
@@ -7,10 +8,11 @@ class AboutScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Acerca de'),
+        title: Text(l10n.aboutTitle),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -33,7 +35,7 @@ class AboutScreen extends StatelessWidget {
                         size: 52, color: color.primary),
                   ),
                   const SizedBox(height: 12),
-                  Text('STUDYTRACK',
+                  Text(l10n.appTitle,
                       style: Theme.of(context)
                           .textTheme
                           .headlineMedium
@@ -48,21 +50,16 @@ class AboutScreen extends StatelessWidget {
             ),
             const SizedBox(height: 28),
 
-            Text('¿Qué es StudyTrack?',
+            Text(l10n.aboutTitle,
                 style: Theme.of(context)
                     .textTheme
                     .titleMedium
                     ?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            const Text(
-              'StudyTrack es una aplicación móvil diseñada para estudiantes '
-              'que buscan organizar su tiempo de estudio y evitar la sobrecarga '
-              'académica. Permite registrar tareas, asignar fechas límite y '
-              'recibir recordatorios personalizados.',
-            ),
+            Text(l10n.aboutDescription),
             const SizedBox(height: 24),
 
-            Text('Características',
+            Text(l10n.aboutFeatures,
                 style: Theme.of(context)
                     .textTheme
                     .titleMedium
@@ -72,7 +69,7 @@ class AboutScreen extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            Text('Tecnologías',
+            Text(l10n.aboutTechnologies,
                 style: Theme.of(context)
                     .textTheme
                     .titleMedium
