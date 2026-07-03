@@ -22,13 +22,28 @@ import 'survey/survey_screen.dart';
 import 'theme/material_theme.dart';
 import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
-import 'package:flutter_timezone/flutter_timezone.dart';
+
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+    // Inicializar Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+    // Probar conexión con Firestore
+  await FirebaseFirestore.instance.collection('test').add({
+    'mensaje': 'Firebase conectado',
+    'fecha': DateTime.now(),
+  });
 
   tz_data.initializeTimeZones();
   final offsetMs = DateTime.now().timeZoneOffset.inMilliseconds;
