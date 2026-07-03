@@ -31,6 +31,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'l10n/app_localizations.dart';
 
+import 'data/auth_repository_impl.dart';
+import 'domain/auth_repository.dart';
+import 'viewmodels/auth_viewmodel.dart';
+import 'ui/screens/login_screen.dart';
+import 'ui/screens/auth_guard.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -113,6 +119,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => SurveyViewModel(SurveyLoader())..loadQuestions(),
         ),
+        ChangeNotifierProvider(
+          create: (_) => AuthViewModel(AuthRepositoryImpl()),
+        ),
       ],
       child: Consumer<PreferencesProvider>(
         builder: (context, prefs, _) {
@@ -137,6 +146,7 @@ class MyApp extends StatelessWidget {
             darkTheme: theme.dark(),
             initialRoute: '/calendar',
             routes: {
+              '/': (_) => const AuthGuard(),
               '/calendar': (_) => const CalendarScreen(),
               '/tasks': (_) => const TasksScreen(),
               '/about': (_) => const AboutScreen(),
