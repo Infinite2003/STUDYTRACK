@@ -20,6 +20,10 @@ class ProfileScreen extends StatelessWidget {
             tooltip: 'Cerrar sesión',
             onPressed: () async {
               await context.read<AuthViewModel>().signOut();
+
+              if (context.mounted) {
+                Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+              }
               // AuthGuard redirige automáticamente a LoginScreen
             },
           ),
@@ -103,6 +107,10 @@ class ProfileScreen extends StatelessWidget {
                 child: OutlinedButton.icon(
                   onPressed: () async {
                     await context.read<AuthViewModel>().signOut();
+
+                    if (context.mounted) {
+                      Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+                    }
                   },
                   icon: const Icon(Icons.logout, color: Colors.red),
                   label: const Text(

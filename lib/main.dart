@@ -144,7 +144,7 @@ class MyApp extends StatelessWidget {
             themeMode: prefs.darkMode ? ThemeMode.dark : ThemeMode.light,
             theme: theme.light(),
             darkTheme: theme.dark(),
-            initialRoute: '/calendar',
+            initialRoute: '/',
             routes: {
               '/': (_) => const AuthGuard(),
               '/calendar': (_) => const CalendarScreen(),
