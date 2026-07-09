@@ -1,18 +1,22 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../domain/task2.dart';
 import '../domain/create_task_usecase.dart';
+import '../data/firestore_task_repository.dart';
 
 class TaskViewModel extends ChangeNotifier {
   final CreateTaskUseCase createTaskUseCase;
   final GetTasksUseCase getTasksUseCase;
   final UpdateTaskUseCase updateTaskUseCase;
   final DeleteTaskUseCase deleteTaskUseCase;
+  final FirestoreTaskRepository firestoreRepository;
 
   TaskViewModel({
     required this.createTaskUseCase,
     required this.getTasksUseCase,
     required this.updateTaskUseCase,
     required this.deleteTaskUseCase,
+    required this.firestoreRepository,
   }) {
     loadTasks();
   }
@@ -22,20 +26,14 @@ class TaskViewModel extends ChangeNotifier {
   String? errorMessage;
 
   List<Task2> get tasks => _tasks;
+  List<Task2> get pendingTasks => _tasks.where((t) => !t.completed).toList();
+  List<Task2> get completedTasks => _tasks.where((t) => t.completed).toList();
 
-  List<Task2> get pendingTasks =>
-      _tasks.where((t) => !t.completed).toList();
-
-  List<Task2> get completedTasks =>
-      _tasks.where((t) => t.completed).toList();
-
-  /// Tareas ordenadas según preferencia del usuario
   List<Task2> sortedTasks(String sortBy) {
     final list = List<Task2>.from(_tasks);
     if (sortBy == 'date') {
       list.sort((a, b) => a.dueDate.compareTo(b.dueDate));
     } else {
-      // 'creation' — el id es un timestamp de creación
       list.sort((a, b) => a.id.compareTo(b.id));
     }
     return list;
@@ -47,7 +45,6 @@ class TaskViewModel extends ChangeNotifier {
   List<Task2> sortedCompleted(String sortBy) =>
       sortedTasks(sortBy).where((t) => t.completed).toList();
 
-  /// Tareas del día para el calendario
   List<Task2> tasksForDay(DateTime day) {
     return _tasks.where((t) {
       return t.dueDate.year == day.year &&
@@ -124,5 +121,23 @@ class TaskViewModel extends ChangeNotifier {
       notifyListeners();
       return false;
     }
+  }
+
+  Future<String?> shareTaskWithEmail(String taskId, String email) async {
+    try {
+      final targetUserId =
+          await firestoreRepository.findUserIdByEmail(email);
+      if (targetUserId == null) {
+        return 'No se encontró un usuario con ese correo';
+      }
+      await firestoreRepository.shareTaskWithUser(taskId, targetUserId);
+      return null;
+    } catch (e) {
+      return 'Error al compartir: $e';
+    }
+  }
+
+  Future<void> removeSharedUser(String taskId, String targetUserId) async {
+    await firestoreRepository.removeUserFromTask(taskId, targetUserId);
   }
 }

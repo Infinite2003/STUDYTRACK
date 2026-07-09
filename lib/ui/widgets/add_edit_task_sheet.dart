@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../domain/task2.dart';
 import '../../viewmodels/task_viewmodel.dart';
 import '../../l10n/app_localizations.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AddEditTaskSheet extends StatefulWidget {
   final Task2? taskToEdit; // null = crear nueva
@@ -72,6 +73,7 @@ class _AddEditTaskSheetState extends State<AddEditTaskSheet> {
     setState(() => _isLoading = true);
 
     final vm = context.read<TaskViewModel>();
+    final uid = FirebaseAuth.instance.currentUser!.uid;
     final task = Task2(
       id: _isEditing
           ? widget.taskToEdit!.id
@@ -81,6 +83,8 @@ class _AddEditTaskSheetState extends State<AddEditTaskSheet> {
       dueDate: _dueDate,
       completed: _isEditing ? widget.taskToEdit!.completed : false,
       reminderHours: _reminderHours,
+      ownerUserId: uid,
+      members: [uid],
     );
 
     final success =

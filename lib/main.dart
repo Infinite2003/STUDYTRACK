@@ -1,60 +1,48 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:timezone/data/latest.dart' as tz_data;
+import 'package:timezone/timezone.dart' as tz;
 
 import 'data/hive_datasource.dart';
 import 'data/task_repository_impl.dart';
 import 'data/notification_service.dart';
-
+import 'data/firestore_task_repository.dart';
+import 'data/auth_repository_impl.dart';
 import 'domain/create_task_usecase.dart';
-
 import 'viewmodels/task_viewmodel.dart';
 import 'viewmodels/survey_viewmodel.dart';
+import 'viewmodels/auth_viewmodel.dart';
 import 'services/survey_loader.dart';
-
 import 'presentation/preferences/preferences_provider.dart';
 import 'presentation/preferences/preferences_screen.dart';
 import 'ui/screens/calendar_screen.dart';
 import 'ui/screens/tasks_screen.dart';
 import 'ui/screens/about_screen.dart';
 import 'ui/screens/profile_screen.dart';
+import 'ui/screens/auth_guard.dart';
 import 'survey/survey_screen.dart';
 import 'theme/material_theme.dart';
-import 'package:timezone/data/latest.dart' as tz_data;
-import 'package:timezone/timezone.dart' as tz;
-
-import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'l10n/app_localizations.dart';
-
-import 'data/auth_repository_impl.dart';
-import 'domain/auth_repository.dart';
-import 'viewmodels/auth_viewmodel.dart';
-import 'ui/screens/login_screen.dart';
-import 'ui/screens/auth_guard.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-    // Inicializar Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-    // Probar conexión con Firestore
-  await FirebaseFirestore.instance.collection('test').add({
-    'mensaje': 'Firebase conectado',
-    'fecha': DateTime.now(),
-  });
-
   tz_data.initializeTimeZones();
-  final offsetMs = DateTime.now().timeZoneOffset.inMilliseconds;
+  final offsetMs = DateTime.now().timeZoneOffset.inMilliseconds; // ✅ int
   tz.Location localLoc = tz.UTC;
-  const chileZones = ['America/Santiago', 'America/Punta_Arenas', 'Pacific/Easter'];
+  const chileZones = [
+    'America/Santiago',
+    'America/Punta_Arenas',
+    'Pacific/Easter'
+  ];
   for (final zoneName in chileZones) {
     try {
       final loc = tz.getLocation(zoneName);
@@ -96,7 +84,6 @@ void main() async {
   runApp(MyApp(repository: repository));
 }
 
-
 class MyApp extends StatelessWidget {
   final TaskRepositoryImpl repository;
   const MyApp({super.key, required this.repository});
@@ -111,6 +98,7 @@ class MyApp extends StatelessWidget {
             getTasksUseCase: GetTasksUseCase(repository),
             updateTaskUseCase: UpdateTaskUseCase(repository),
             deleteTaskUseCase: DeleteTaskUseCase(repository),
+            firestoreRepository: FirestoreTaskRepository(), // ✅ agregado
           ),
         ),
         ChangeNotifierProvider(
@@ -129,7 +117,6 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'StudyTrack',
-            // i18n
             localizationsDelegates: const [
               AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,
@@ -144,7 +131,7 @@ class MyApp extends StatelessWidget {
             themeMode: prefs.darkMode ? ThemeMode.dark : ThemeMode.light,
             theme: theme.light(),
             darkTheme: theme.dark(),
-            initialRoute: '/calendar',
+            initialRoute: '/',
             routes: {
               '/': (_) => const AuthGuard(),
               '/calendar': (_) => const CalendarScreen(),
