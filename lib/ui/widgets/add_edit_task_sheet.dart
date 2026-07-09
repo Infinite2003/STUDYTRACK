@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../domain/task2.dart';
 import '../../viewmodels/task_viewmodel.dart';
 
 class AddEditTaskSheet extends StatefulWidget {
-  final Task2? taskToEdit; // null = crear nueva
+  final Task2? taskToEdit;
 
   const AddEditTaskSheet({super.key, this.taskToEdit});
 
@@ -71,6 +72,8 @@ class _AddEditTaskSheetState extends State<AddEditTaskSheet> {
     setState(() => _isLoading = true);
 
     final vm = context.read<TaskViewModel>();
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+
     final task = Task2(
       id: _isEditing
           ? widget.taskToEdit!.id
@@ -80,6 +83,7 @@ class _AddEditTaskSheetState extends State<AddEditTaskSheet> {
       dueDate: _dueDate,
       completed: _isEditing ? widget.taskToEdit!.completed : false,
       reminderHours: _reminderHours,
+      userId: _isEditing ? widget.taskToEdit!.userId : uid,
     );
 
     final success =
@@ -92,9 +96,7 @@ class _AddEditTaskSheetState extends State<AddEditTaskSheet> {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(_isEditing
-              ? '✅ Tarea actualizada'
-              : '✅ Tarea creada'),
+          content: Text(_isEditing ? '✅ Tarea actualizada' : '✅ Tarea creada'),
           backgroundColor: Colors.green,
         ),
       );
@@ -124,7 +126,6 @@ class _AddEditTaskSheetState extends State<AddEditTaskSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
             Row(
               children: [
                 Icon(
@@ -141,8 +142,6 @@ class _AddEditTaskSheetState extends State<AddEditTaskSheet> {
               ],
             ),
             const SizedBox(height: 16),
-
-            // Título
             TextFormField(
               controller: _titleCtrl,
               decoration: InputDecoration(
@@ -156,8 +155,6 @@ class _AddEditTaskSheetState extends State<AddEditTaskSheet> {
               textCapitalization: TextCapitalization.sentences,
             ),
             const SizedBox(height: 12),
-
-            // Descripción
             TextFormField(
               controller: _descCtrl,
               decoration: InputDecoration(
@@ -170,8 +167,6 @@ class _AddEditTaskSheetState extends State<AddEditTaskSheet> {
               textCapitalization: TextCapitalization.sentences,
             ),
             const SizedBox(height: 12),
-
-            // Fecha límite
             ListTile(
               contentPadding: EdgeInsets.zero,
               leading: Icon(Icons.calendar_today,
@@ -185,12 +180,9 @@ class _AddEditTaskSheetState extends State<AddEditTaskSheet> {
                 ),
               ),
               onTap: _pickDate,
-              trailing:
-                  const Icon(Icons.arrow_forward_ios, size: 14),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 14),
             ),
             const Divider(),
-
-            // Horas de recordatorio
             ListTile(
               contentPadding: EdgeInsets.zero,
               leading: Icon(Icons.notifications,
@@ -211,8 +203,6 @@ class _AddEditTaskSheetState extends State<AddEditTaskSheet> {
               onChanged: (v) => setState(() => _reminderHours = v.toInt()),
             ),
             const SizedBox(height: 16),
-
-            // Botón guardar
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(

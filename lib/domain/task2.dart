@@ -4,7 +4,8 @@ class Task2 {
   final String description;
   final DateTime dueDate;
   final bool completed;
-  final int reminderHours; // cuántas horas antes notificar
+  final int reminderHours;
+  final String userId;
 
   Task2({
     required this.id,
@@ -13,6 +14,7 @@ class Task2 {
     required this.dueDate,
     this.completed = false,
     this.reminderHours = 24,
+    required this.userId,
   });
 
   Task2 copyWith({
@@ -22,6 +24,7 @@ class Task2 {
     DateTime? dueDate,
     bool? completed,
     int? reminderHours,
+    String? userId,
   }) {
     return Task2(
       id: id ?? this.id,
@@ -30,6 +33,7 @@ class Task2 {
       dueDate: dueDate ?? this.dueDate,
       completed: completed ?? this.completed,
       reminderHours: reminderHours ?? this.reminderHours,
+      userId: userId ?? this.userId,
     );
   }
 
@@ -41,6 +45,7 @@ class Task2 {
       'dueDate': dueDate.toIso8601String(),
       'completed': completed,
       'reminderHours': reminderHours,
+      'userId': userId,
     };
   }
 
@@ -52,6 +57,7 @@ class Task2 {
       dueDate: DateTime.parse(map['dueDate'] as String),
       completed: map['completed'] as bool? ?? false,
       reminderHours: map['reminderHours'] as int? ?? 24,
+      userId: map['userId'] as String,
     );
   }
 }

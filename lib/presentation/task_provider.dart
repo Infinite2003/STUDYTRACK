@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../domain/task2.dart';
 import '../../domain/create_task_usecase.dart';
 
@@ -16,11 +17,14 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
+      final uid = FirebaseAuth.instance.currentUser!.uid;
+
       final task = Task2(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         title: "Tarea PoC",
         description: "Descripción de prueba",
         dueDate: DateTime.now().add(const Duration(days: 1)),
+        userId: uid,
       );
 
       await createTaskUseCase.execute(task);
