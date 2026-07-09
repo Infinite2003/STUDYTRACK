@@ -6,6 +6,7 @@ import '../../presentation/preferences/preferences_provider.dart';
 import '../../domain/task2.dart';
 import '../widgets/task_card.dart';
 import '../widgets/add_edit_task_sheet.dart';
+import '../../l10n/app_localizations.dart';
 import 'calendar_screen.dart';
 
 class TasksScreen extends StatelessWidget {
@@ -26,21 +27,22 @@ class TasksScreen extends StatelessWidget {
   }
 
   void _confirmDelete(BuildContext context, Task2 task) {
+    final l10n = AppLocalizations.of(context)!; // 👈 AGREGAR
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Eliminar tarea'),
-        content: Text('¿Eliminar "${task.title}"?'),
+        title: Text(l10n.deleteTask), 
+        content: Text(l10n.confirmDelete(task.title)), 
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancelar')),
+              child: Text(l10n.cancel)), 
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               context.read<TaskViewModel>().deleteTask(task.id);
             },
-            child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+            child: Text(l10n.delete, style: const TextStyle(color: Colors.red)), 
           ),
         ],
       ),
@@ -51,17 +53,18 @@ class TasksScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final vm = context.watch<TaskViewModel>();
     final prefs = context.watch<PreferencesProvider>();
+    final l10n = AppLocalizations.of(context)!;
 
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Mis Tareas'),
+          title: Text(l10n.tasks),
           centerTitle: true,
-          bottom: const TabBar(
+          bottom: TabBar(
             tabs: [
-              Tab(icon: Icon(Icons.pending_actions), text: 'Pendientes'),
-              Tab(icon: Icon(Icons.check_circle), text: 'Completadas'),
+              Tab(icon:  Icon(Icons.pending_actions), text: l10n.pending), // 👈 CAMBIAR
+              Tab(icon:  Icon(Icons.check_circle), text: l10n.completed),
             ],
           ),
         ),
@@ -71,7 +74,7 @@ class TasksScreen extends StatelessWidget {
                 children: [
                   _TaskList(
                     tasks: vm.sortedPending(prefs.sortBy),
-                    emptyMessage: 'No tienes tareas pendientes',
+                    emptyMessage: l10n.noPendingTasks,
                     emptyIcon: Icons.check_circle_outline,
                     vm: vm,
                     sortBy: prefs.sortBy,

@@ -10,6 +10,7 @@ class PreferencesProvider extends ChangeNotifier {
   String sortBy = 'date';
   bool showCompletedInCalendar = true;
   bool startOnMonday = true;
+  Locale locale = const Locale('es');
 
   Future<void> loadPreferences() async {
     notificationsEnabled = await storage.getNotifications();
@@ -18,6 +19,8 @@ class PreferencesProvider extends ChangeNotifier {
     sortBy = await storage.getSortBy();
     showCompletedInCalendar = await storage.getShowCompletedInCalendar();
     startOnMonday = await storage.getStartOnMonday();
+    final localeCode = await storage.getLocale();
+    locale = Locale(localeCode);
     notifyListeners();
   }
 
@@ -54,6 +57,12 @@ class PreferencesProvider extends ChangeNotifier {
   Future<void> setStartOnMonday(bool value) async {
     startOnMonday = value;
     await storage.saveStartOnMonday(value);
+    notifyListeners();
+  }
+
+  Future<void> setLocale(String languageCode) async {
+    locale = Locale(languageCode);
+    await storage.saveLocale(languageCode);
     notifyListeners();
   }
 }

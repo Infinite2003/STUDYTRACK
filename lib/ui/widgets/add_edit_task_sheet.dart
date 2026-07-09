@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../domain/task2.dart';
 import '../../viewmodels/task_viewmodel.dart';
+import '../../l10n/app_localizations.dart';
 
 class AddEditTaskSheet extends StatefulWidget {
   final Task2? taskToEdit;
@@ -92,11 +93,13 @@ class _AddEditTaskSheetState extends State<AddEditTaskSheet> {
     if (!mounted) return;
     setState(() => _isLoading = false);
 
+    final l10n = AppLocalizations.of(context)!;
+
     if (success) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(_isEditing ? '✅ Tarea actualizada' : '✅ Tarea creada'),
+          content: Text(_isEditing ? l10n.taskUpdated : l10n.taskCreated),
           backgroundColor: Colors.green,
         ),
       );
@@ -113,6 +116,8 @@ class _AddEditTaskSheetState extends State<AddEditTaskSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -134,7 +139,7 @@ class _AddEditTaskSheetState extends State<AddEditTaskSheet> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  _isEditing ? 'Editar tarea' : 'Nueva tarea',
+                  _isEditing ? l10n.editTask : l10n.newTask,
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -145,20 +150,19 @@ class _AddEditTaskSheetState extends State<AddEditTaskSheet> {
             TextFormField(
               controller: _titleCtrl,
               decoration: InputDecoration(
-                labelText: 'Título *',
+                labelText: l10n.titleField,
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10)),
                 prefixIcon: const Icon(Icons.title),
               ),
-              validator: (v) =>
-                  v == null || v.trim().isEmpty ? 'Ingresa un título' : null,
+              validator: (v) => v == null || v.trim().isEmpty ? l10n.titleRequired : null,
               textCapitalization: TextCapitalization.sentences,
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: _descCtrl,
               decoration: InputDecoration(
-                labelText: 'Descripción (opcional)',
+                labelText: l10n.descriptionField,
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10)),
                 prefixIcon: const Icon(Icons.notes),
@@ -171,7 +175,7 @@ class _AddEditTaskSheetState extends State<AddEditTaskSheet> {
               contentPadding: EdgeInsets.zero,
               leading: Icon(Icons.calendar_today,
                   color: Theme.of(context).colorScheme.primary),
-              title: const Text('Fecha límite'),
+              title: Text(l10n.dueDate), 
               subtitle: Text(
                 _formatDate(_dueDate),
                 style: TextStyle(
@@ -187,9 +191,9 @@ class _AddEditTaskSheetState extends State<AddEditTaskSheet> {
               contentPadding: EdgeInsets.zero,
               leading: Icon(Icons.notifications,
                   color: Theme.of(context).colorScheme.secondary),
-              title: const Text('Recordatorio'),
+              title: Text(l10n.reminder),
               subtitle: Text(
-                '$_reminderHours horas antes',
+                l10n.hoursBeforeReminder(_reminderHours),
                 style: TextStyle(
                     color: Theme.of(context).colorScheme.secondary),
               ),
@@ -214,7 +218,7 @@ class _AddEditTaskSheetState extends State<AddEditTaskSheet> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.save),
-                label: Text(_isEditing ? 'Guardar cambios' : 'Crear tarea'),
+                label: Text(_isEditing ? l10n.saveChanges : l10n.createTask),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(

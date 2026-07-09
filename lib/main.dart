@@ -31,7 +31,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-Future<void> main() async {
+
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'l10n/app_localizations.dart';
+
+import 'data/auth_repository_impl.dart';
+import 'viewmodels/auth_viewmodel.dart';
+import 'ui/screens/auth_guard.dart';
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(
@@ -46,14 +54,25 @@ Future<void> main() async {
   tz_data.initializeTimeZones();
   final offsetMs = DateTime.now().timeZoneOffset.inMilliseconds;
   tz.Location localLoc = tz.UTC;
-  for (final loc in tz.timeZoneDatabase.locations.values) {
-    if (loc.currentTimeZone.offset == offsetMs) {
-      localLoc = loc;
-      break;
+  const chileZones = ['America/Santiago', 'America/Punta_Arenas', 'Pacific/Easter'];
+  for (final zoneName in chileZones) {
+    try {
+      final loc = tz.getLocation(zoneName);
+      if (loc.currentTimeZone.offset == offsetMs) {
+        localLoc = loc;
+        break;
+      }
+    } catch (_) {}
+  }
+  if (localLoc == tz.UTC && offsetMs != 0) {
+    for (final loc in tz.timeZoneDatabase.locations.values) {
+      if (loc.currentTimeZone.offset == offsetMs) {
+        localLoc = loc;
+        break;
+      }
     }
   }
   tz.setLocalLocation(localLoc);
-  print('=== Zona detectada: ${localLoc.name} ===');
 
   await Hive.initFlutter();
   await Hive.openBox(HiveDatasource.boxName);
@@ -96,6 +115,7 @@ Future<void> main() async {
   runApp(MyApp(repository: repository));
 }
 
+
 class MyApp extends StatelessWidget {
   final TaskRepository repository;
   const MyApp({super.key, required this.repository});
@@ -118,19 +138,34 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => SurveyViewModel(SurveyLoader())..loadQuestions(),
         ),
+        ChangeNotifierProvider(
+          create: (_) => AuthViewModel(AuthRepositoryImpl()),
+        ),
       ],
       child: Consumer<PreferencesProvider>(
         builder: (context, prefs, _) {
           final theme = MaterialTheme(Theme.of(context).textTheme);
-
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'StudyTrack',
+            // i18n
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('es'),
+              Locale('en'),
+            ],
+            locale: prefs.locale,
             themeMode: prefs.darkMode ? ThemeMode.dark : ThemeMode.light,
             theme: theme.light(),
             darkTheme: theme.dark(),
-            initialRoute: '/calendar',
+            initialRoute: '/',
             routes: {
+              '/': (_) => const AuthGuard(),
               '/calendar': (_) => const CalendarScreen(),
               '/tasks': (_) => const TasksScreen(),
               '/about': (_) => const AboutScreen(),

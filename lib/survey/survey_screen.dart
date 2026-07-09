@@ -3,13 +3,15 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../viewmodels/survey_viewmodel.dart';
+import '../../l10n/app_localizations.dart';
 
 class SurveyScreen extends StatelessWidget {
   const SurveyScreen({super.key});
 
   Future<void> _sendEmail(BuildContext context, SurveyViewModel provider) async {
+    final l10n = AppLocalizations.of(context)!;
   final body = provider.buildEmailBody();
-  final subject = Uri.encodeComponent('Evaluación STUDYTRACK - Beta Testing');
+  final subject = Uri.encodeComponent(l10n.surveyTitle);
   final encodedBody = Uri.encodeComponent(body);
 
   final Uri emailUri = Uri.parse(
@@ -24,14 +26,14 @@ class SurveyScreen extends StatelessWidget {
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
-          title: const Text('Copiar respuestas'),
+          title: Text(l10n.surveyTitle),
           content: SingleChildScrollView(
             child: SelectableText(body), // SelectableText permite copiar
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cerrar'),
+              child: Text(l10n.cancel),
             ),
           ],
         ),
@@ -43,10 +45,11 @@ class SurveyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<SurveyViewModel>();
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Evaluación STUDYTRACK'),
+        title: Text(l10n.surveyTitle), 
         centerTitle: true,
         leading: Navigator.canPop(context)
             ? const BackButton()
@@ -63,7 +66,7 @@ class SurveyScreen extends StatelessWidget {
                   child: Row(
                     children: [
                       Text(
-                        '${provider.answers.length} / ${provider.questions.length} respondidas',
+                        l10n.surveyProgress(provider.answers.length, provider.questions.length),
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                       const SizedBox(width: 12),
@@ -203,12 +206,12 @@ class SurveyScreen extends StatelessWidget {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    '${question.min} = Muy malo',
+                                    l10n.surveyMinLabel(question.min),
                                     style:
                                         Theme.of(context).textTheme.bodySmall,
                                   ),
                                   Text(
-                                    '${question.max} = Excelente',
+                                    l10n.surveyMaxLabel(question.max),
                                     style:
                                         Theme.of(context).textTheme.bodySmall,
                                   ),
@@ -234,8 +237,8 @@ class SurveyScreen extends StatelessWidget {
                       icon: const Icon(Icons.send),
                       label: Text(
                         provider.allAnswered
-                            ? 'Enviar evaluación por correo'
-                            : 'Responde todas las preguntas',
+                            ? l10n.surveySend // 👈 CAMBIAR
+                            : l10n.surveyAnswerAll
                       ),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../domain/task2.dart';
 import 'package:share_plus/share_plus.dart';
+import '../../l10n/app_localizations.dart';
 
 class TaskCard extends StatelessWidget {
   final Task2 task;
@@ -29,6 +30,7 @@ class TaskCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final urgency = _urgencyColor(context);
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       elevation: 2,
@@ -123,13 +125,12 @@ class TaskCard extends StatelessWidget {
             if (value == 'delete') onDelete();
             if (value == 'share') _shareTask(context);
           },
-          itemBuilder: (_) => const [
-            PopupMenuItem(value: 'edit', child: Text('Editar')),
-            PopupMenuItem(value: 'share', child: Text('Compartir')),
+          itemBuilder: (_) => [
+            PopupMenuItem(value: 'edit', child: Text(l10n.edit)), // 👈 CAMBIAR
+            PopupMenuItem(value: 'share', child: Text(l10n.share)),
             PopupMenuItem(
               value: 'delete',
-              child: Text('Eliminar',
-                  style: TextStyle(color: Colors.red)),
+              child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
             ),
           ],
         ),
@@ -145,23 +146,23 @@ class TaskCard extends StatelessWidget {
     return '${date.day} ${months[date.month]} ${date.year}  ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
   }
 
-  void _shareTask(BuildContext context) {
+  void _shareTask(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
     final fechaVence = '${task.dueDate.day}/${task.dueDate.month}/${task.dueDate.year} '
         '${task.dueDate.hour.toString().padLeft(2, '0')}:'
         '${task.dueDate.minute.toString().padLeft(2, '0')}';
 
-    final texto = ' Tarea: ${task.title}\n'
-        'Descripción: ${task.description}\n'
-        'Vence: $fechaVence\n'
-        'Estado: ${task.completed ? "Completada" : "Pendiente"}\n\n'
-        'Enviado desde StudyTrack';
+    final status = task.completed ? l10n.statusCompleted : l10n.statusPending;
 
-    SharePlus.instance.share(
-      ShareParams(
-        text: texto,
-        subject: 'Tarea: ${task.title}',
-      ),
+    final texto = l10n.shareTaskText(
+      task.title,
+      task.description,
+      fechaVence,
+      status,
     );
+
+    // Para versión 13.x
+    await Share.share(texto);
   }
 
 }

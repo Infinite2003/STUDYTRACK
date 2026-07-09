@@ -12,7 +12,20 @@
           "package_name": "cl.Pereira.STUDYTRACK"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "602901731854-qornoc1ct5igfcher4ujsb9l3qbioijn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "cl.Pereira.STUDYTRACK",
+            "certificate_hash": "f12eea321b2663a5ff19c887b3805709a6f17c47"
+          }
+        },
+        {
+          "client_id": "602901731854-gjodmloafjfs9bt37c59rj56ulqrupfr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyC8V3409azQ9cXP3BR_wEoSQAtu9CbE8j8"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "602901731854-gjodmloafjfs9bt37c59rj56ulqrupfr.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "602901731854-av83gjbafltaf8qgp2o4qu2a044etbpo.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.studytrack"
+              }
+            }
+          ]
         }
       }
     }

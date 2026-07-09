@@ -7,6 +7,7 @@ class PreferencesStorage {
   static const String sortByKey = "sort_by"; // 'date' | 'creation'
   static const String showCompletedInCalendarKey = "show_completed_calendar";
   static const String startOnMondayKey = "start_on_monday"; 
+  static const String localeKey = "locale";
 
   Future<void> saveNotifications(bool value) async {
     final prefs = await SharedPreferences.getInstance();
@@ -71,4 +72,13 @@ class PreferencesStorage {
     return prefs.getBool(startOnMondayKey) ?? true;
   }
   
+  Future<void> saveLocale(String languageCode) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(localeKey, languageCode);
+  }
+
+  Future<String> getLocale() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(localeKey) ?? 'es';
+  }
 }

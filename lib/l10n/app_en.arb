@@ -1,0 +1,120 @@
+{
+  "@@locale": "en",
+
+  "appTitle": "StudyTrack",
+  "calendar": "Calendar",
+  "tasks": "Tasks",
+  "about": "About",
+  "preferences": "Preferences",
+  "profile": "My Profile",
+  "survey": "Survey",
+
+  "newTask": "New task",
+  "editTask": "Edit task",
+  "createTask": "Create task",
+  "saveChanges": "Save changes",
+  "deleteTask": "Delete task",
+  "confirmDelete": "Delete \"{title}\"?",
+  "@confirmDelete": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "taskCreated": "✅ Task created",
+  "taskUpdated": "✅ Task updated",
+
+  "titleField": "Title *",
+  "titleRequired": "Enter a title",
+  "descriptionField": "Description (optional)",
+  "dueDate": "Due date",
+  "reminder": "Reminder",
+  "hoursBeforeReminder": "{hours} hours before",
+  "@hoursBeforeReminder": {
+    "placeholders": {
+      "hours": { "type": "int" }
+    }
+  },
+
+  "pending": "Pending",
+  "completed": "Completed",
+  "noPendingTasks": "No pending tasks 🎉",
+  "noCompletedTasks": "No completed tasks yet",
+  "noTasksForDay": "No tasks for this day",
+  "noTasksThisDay": "No tasks this day",
+  "taskCount": "{count} task(s)",
+  "@taskCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "notificationsEnabled": "Notifications enabled",
+  "notificationsSubtitle": "Receive task reminders",
+  "reminderAnticipation": "Reminder anticipation",
+  "reminderAnticipationSubtitle": "{hours} hours before due date",
+  "@reminderAnticipationSubtitle": {
+    "placeholders": {
+      "hours": { "type": "int" }
+    }
+  },
+  "weekStartsMonday": "Week starts on Monday",
+  "weekStartsMondaySubtitle": "Affects the calendar view",
+  "showCompleted": "Show completed tasks",
+  "showCompletedSubtitle": "Include completed tasks in calendar",
+  "sortBy": "Sort tasks by",
+  "sortByDate": "Due date",
+  "sortByCreation": "Creation date",
+  "darkMode": "Dark mode",
+  "language": "Language",
+  "preferencesAutoSave": "Preferences are saved automatically.",
+
+  "sectionNotifications": "Notifications",
+  "sectionCalendar": "Calendar",
+  "sectionTasks": "Tasks",
+  "sectionAppearance": "Appearance",
+  "sectionLanguage": "Language",
+
+  "aboutTitle": "About",
+  "aboutDescription": "StudyTrack is a mobile app designed for students looking to organize their study time and avoid academic overload.",
+  "aboutFeatures": "Features",
+  "aboutTechnologies": "Technologies",
+
+  "surveyTitle": "STUDYTRACK Survey",
+  "surveyProgress": "{answered} / {total} answered",
+  "@surveyProgress": {
+    "placeholders": {
+      "answered": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "surveySend": "Send survey by email",
+  "surveyAnswerAll": "Answer all questions",
+  "surveyMinLabel": "{min} = Very bad",
+  "@surveyMinLabel": {
+    "placeholders": {
+      "min": { "type": "int" }
+    }
+  },
+  "surveyMaxLabel": "{max} = Excellent",
+  "@surveyMaxLabel": {
+    "placeholders": {
+      "max": { "type": "int" }
+    }
+  },
+
+  "edit": "Edit",
+  "share": "Share",
+  "shareTaskText": "📚 Task: {title}\n📝 Description: {description}\n⏰ Due: {dueDate}\n✅ Status: {status}\n\nSent from StudyTrack",
+  "@shareTaskText": {
+    "placeholders": {
+      "title": { "type": "String" },
+      "description": { "type": "String" },
+      "dueDate": { "type": "String" },
+      "status": { "type": "String" }
+    }
+  },
+  "statusCompleted": "Completed",
+  "statusPending": "Pending"
+}
