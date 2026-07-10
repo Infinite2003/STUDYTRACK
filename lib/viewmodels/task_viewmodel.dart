@@ -130,14 +130,16 @@ class TaskViewModel extends ChangeNotifier {
     }
   }
 
-  Future<String?> shareTaskWithEmail(String taskId, String email) async {
+  Future<String?> shareTaskWithEmail(
+    String taskId, String taskOwnerId, String email) async {
     try {
       final targetUserId =
           await firestoreRepository.findUserIdByEmail(email);
       if (targetUserId == null) {
         return 'No se encontró un usuario con ese correo';
       }
-      await firestoreRepository.shareTaskWithUser(taskId, targetUserId);
+      await firestoreRepository.shareTaskWithUser(
+          taskId, taskOwnerId, targetUserId);
       return null;
     } catch (e) {
       return 'Error al compartir: $e';

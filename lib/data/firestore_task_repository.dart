@@ -30,61 +30,53 @@ class FirestoreTaskRepository {
   }
 
   Future<void> shareTaskWithUser(
-        String taskId,
-        String targetUserId,
-    ) async {
-      final currentUid = FirebaseAuth.instance.currentUser!.uid;
+      String taskId, String ownerUserId, String targetUserId) async {
+    await _db
+        .collection('users')
+        .doc(ownerUserId)
+        .collection('tasks')
+        .doc(taskId)
+        .update({
+      'members': FieldValue.arrayUnion([targetUserId]),
+    });
+  }
 
-      // Documento de la tarea del usuario actual
-      final sourceDoc = await _db
-          .collection('users')
-          .doc(currentUid)
-          .collection('tasks')
-          .doc(taskId)
-          .get();
-
-      if (!sourceDoc.exists) {
-        throw Exception('La tarea no existe');
-      }
-
-      final data = sourceDoc.data()!;
-
-      // Actualizar members
-      final members = List<String>.from(data['members'] ?? []);
-
-      if (!members.contains(targetUserId)) {
-        members.add(targetUserId);
-      }
-
-      data['members'] = members;
-
-      // Actualizar la copia del dueño
-      await sourceDoc.reference.update({
-        'members': members,
-      });
-
-      // Crear la copia para el usuario compartido
-      await _db
-          .collection('users')
-          .doc(targetUserId)
-          .collection('tasks')
-          .doc(taskId)
-          .set(data);
-    }
-
-  Future<void> removeUserFromTask(String taskId, String targetUserId) async {
-    await _tasks.doc(taskId).update({
+  Future<void> removeUserFromTask(
+      String taskId, String ownerUserId, String targetUserId) async {
+    await _db
+        .collection('users')
+        .doc(ownerUserId)
+        .collection('tasks')
+        .doc(taskId)
+        .update({
       'members': FieldValue.arrayRemove([targetUserId]),
     });
   }
 
   Future<String?> findUserIdByEmail(String email) async {
+    print('=== Buscando usuario con email: $email ===');
     final snapshot = await _db
         .collection('users')
         .where('email', isEqualTo: email)
         .limit(1)
         .get();
+    print('=== Documentos encontrados: ${snapshot.docs.length} ===');
     if (snapshot.docs.isEmpty) return null;
     return snapshot.docs.first.id;
   }
+
+   // Stream de tareas compartidas con el usuario
+  // Lee desde todas las subcolecciones donde el usuario es miembro
+  Stream<List<Task2>> sharedTasksStream(String userId) {
+    return _db
+        .collectionGroup('tasks')
+        .where('members', arrayContains: userId)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) =>
+                Task2.fromMap(doc.data()))
+            .toList()
+          ..sort((a, b) => a.dueDate.compareTo(b.dueDate)));
+  }
+
 }

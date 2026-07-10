@@ -48,10 +48,10 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  await FirebaseFirestore.instance.collection('test').add({
+  /*await FirebaseFirestore.instance.collection('test').add({
     'mensaje': 'Firebase conectado',
     'fecha': DateTime.now(),
-  });
+  });*/
 
   tz_data.initializeTimeZones();
   final offsetMs = DateTime.now().timeZoneOffset.inMilliseconds; // ✅ int

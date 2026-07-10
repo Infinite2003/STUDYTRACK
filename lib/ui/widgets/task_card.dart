@@ -223,8 +223,7 @@ class TaskCard extends StatelessWidget {
                   final vm = context.read<TaskViewModel>();
                   final messenger = ScaffoldMessenger.of(context);
 
-                  final error =
-                      await vm.shareTaskWithEmail(task.id, email);
+                  final error = await vm.shareTaskWithEmail(task.id, task.userId, email);
 
                   if (!ctx.mounted) return;
 
