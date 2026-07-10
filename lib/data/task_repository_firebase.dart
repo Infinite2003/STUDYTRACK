@@ -38,6 +38,7 @@ class TaskRepositoryFirebase implements TaskRepository {
           'dueDate': task.dueDate.toIso8601String(),
           'completed': task.completed,
           'reminderHours': task.reminderHours,
+          'userId': uid,
         });
   }
 
@@ -63,6 +64,50 @@ class TaskRepositoryFirebase implements TaskRepository {
       );
     }).toList();
   }
+
+  Stream<List<Task2>> watchTasks(String uid) {
+    return _db
+        .collection('users')
+        .doc(uid)
+        .collection('tasks')
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) {
+              final data = doc.data();
+              return Task2(
+                id: data['id'] ?? doc.id,
+                title: data['title'] ?? '',
+                description: data['description'] ?? '',
+                dueDate:
+                    DateTime.tryParse(data['dueDate'] ?? '') ?? DateTime.now(),
+                completed: data['completed'] ?? false,
+                reminderHours: data['reminderHours'] ?? 24,
+                userId: uid,
+              );
+            }).toList());
+  }
+  @override
+Stream<List<Task2>> watchAllTasks() {
+  final uid = _auth.currentUser!.uid;
+  return _db
+      .collection('users')
+      .doc(uid)
+      .collection('tasks')
+      .snapshots()
+      .map((snapshot) => snapshot.docs.map((doc) {
+            final data = doc.data();
+            return Task2(
+              id: data['id'] ?? doc.id,
+              title: data['title'] ?? '',
+              description: data['description'] ?? '',
+              dueDate:
+                  DateTime.tryParse(data['dueDate'] ?? '') ?? DateTime.now(),
+              completed: data['completed'] ?? false,
+              reminderHours: data['reminderHours'] ?? 24,
+              userId: uid,
+            );
+          }).toList());
+}
+
 
   @override
   Future<void> updateTask(Task2 task) async {

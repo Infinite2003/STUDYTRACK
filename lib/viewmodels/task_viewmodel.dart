@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../domain/task2.dart';
 import '../domain/create_task_usecase.dart';
@@ -20,6 +21,7 @@ class TaskViewModel extends ChangeNotifier {
   List<Task2> _tasks = [];
   bool isLoading = false;
   String? errorMessage;
+  StreamSubscription<List<Task2>>? _subscription;
 
   List<Task2> get tasks => _tasks;
 
@@ -29,13 +31,11 @@ class TaskViewModel extends ChangeNotifier {
   List<Task2> get completedTasks =>
       _tasks.where((t) => t.completed).toList();
 
-  /// Tareas ordenadas según preferencia del usuario
   List<Task2> sortedTasks(String sortBy) {
     final list = List<Task2>.from(_tasks);
     if (sortBy == 'date') {
       list.sort((a, b) => a.dueDate.compareTo(b.dueDate));
     } else {
-      // 'creation' — el id es un timestamp de creación
       list.sort((a, b) => a.id.compareTo(b.id));
     }
     return list;
@@ -47,7 +47,6 @@ class TaskViewModel extends ChangeNotifier {
   List<Task2> sortedCompleted(String sortBy) =>
       sortedTasks(sortBy).where((t) => t.completed).toList();
 
-  /// Tareas del día para el calendario
   List<Task2> tasksForDay(DateTime day) {
     return _tasks.where((t) {
       return t.dueDate.year == day.year &&
@@ -69,12 +68,18 @@ class TaskViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void listenTasks(String uid) {
+    _subscription?.cancel();
+    _subscription = getTasksUseCase.watch(uid).listen((tasks) {
+      _tasks = tasks;
+      notifyListeners();
+    });
+  }
+
   Future<bool> addTask(Task2 task) async {
     try {
       await createTaskUseCase.execute(task);
-      _tasks = await getTasksUseCase.execute();
       errorMessage = null;
-      notifyListeners();
       return true;
     } catch (e) {
       errorMessage = 'Error al guardar: $e';
@@ -86,9 +91,7 @@ class TaskViewModel extends ChangeNotifier {
   Future<bool> editTask(Task2 task) async {
     try {
       await updateTaskUseCase.execute(task);
-      _tasks = await getTasksUseCase.execute();
       errorMessage = null;
-      notifyListeners();
       return true;
     } catch (e) {
       errorMessage = 'Error al editar: $e';
@@ -100,9 +103,7 @@ class TaskViewModel extends ChangeNotifier {
   Future<bool> deleteTask(String id) async {
     try {
       await deleteTaskUseCase.execute(id);
-      _tasks = await getTasksUseCase.execute();
       errorMessage = null;
-      notifyListeners();
       return true;
     } catch (e) {
       errorMessage = 'Error al eliminar: $e';
@@ -115,14 +116,18 @@ class TaskViewModel extends ChangeNotifier {
     try {
       final updated = task.copyWith(completed: !task.completed);
       await updateTaskUseCase.execute(updated);
-      _tasks = await getTasksUseCase.execute();
       errorMessage = null;
-      notifyListeners();
       return true;
     } catch (e) {
       errorMessage = 'Error al actualizar: $e';
       notifyListeners();
       return false;
     }
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
   }
 }

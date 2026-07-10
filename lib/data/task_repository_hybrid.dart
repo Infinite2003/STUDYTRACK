@@ -33,6 +33,11 @@ class TaskRepositoryHybrid implements TaskRepository {
     return remoteTasks.isNotEmpty ? remoteTasks : localTasks;
   }
 
+  Stream<List<Task2>> watchAllTasks() {
+    final uid = _auth.currentUser!.uid;
+    return firebaseRepo.watchTasks(uid);
+  }
+
   @override
   Future<void> updateTask(Task2 task) async {
     final uid = _auth.currentUser!.uid;

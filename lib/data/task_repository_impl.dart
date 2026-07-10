@@ -24,9 +24,13 @@ class TaskRepositoryImpl implements TaskRepository {
   }
 
   @override
+  Stream<List<Task2>> watchAllTasks() {
+    return hiveDatasource.watchAllTasks();
+  }
+
+  @override
   Future<void> updateTask(Task2 task) async {
     await hiveDatasource.updateTask(task);
-    // Reprogramar notificación si se editó
     await notificationService.cancelTaskNotification(task.id);
     if (!task.completed) {
       await notificationService.scheduleTaskNotification(task);

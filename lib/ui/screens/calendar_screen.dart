@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../../l10n/app_localizations.dart';
-
 import '../../viewmodels/task_viewmodel.dart';
 import '../../domain/task2.dart';
 import '../../presentation/preferences/preferences_provider.dart';
 import '../widgets/task_card.dart';
 import '../widgets/add_edit_task_sheet.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -19,6 +19,16 @@ class CalendarScreen extends StatefulWidget {
 class _CalendarScreenState extends State<CalendarScreen> {
   DateTime _focusedDay = DateTime.now();
   DateTime _selectedDay = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    final vm = context.read<TaskViewModel>();
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      vm.listenTasks(uid);
+    }
+  }
 
   void _openAddTask() {
     final vm = context.read<TaskViewModel>();
@@ -77,7 +87,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final prefs = context.watch<PreferencesProvider>();
     final l10n = AppLocalizations.of(context)!;
 
-    // Filtra según preferencia de mostrar completadas
     List<Task2> tasksForDay(DateTime day) {
       return vm.tasksForDay(day).where((t) {
         if (!prefs.showCompletedInCalendar && t.completed) return false;
