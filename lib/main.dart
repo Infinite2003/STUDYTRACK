@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:workmanager/workmanager.dart';
 
 import 'data/hive_datasource.dart';
 import 'data/task_repository_firebase.dart';
 import 'data/task_repository_hybrid.dart';
 import 'data/notification_service.dart';
+import 'services/background_tasks.dart';
 
 import 'domain/create_task_usecase.dart';
 import 'domain/task_repository.dart';
@@ -31,13 +33,25 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'l10n/app_localizations.dart';
 
 import 'data/auth_repository_impl.dart';
 import 'viewmodels/auth_viewmodel.dart';
 import 'ui/screens/auth_guard.dart';
+
+/// Guarda (o actualiza) el token FCM del dispositivo para el usuario dado.
+Future<void> _saveFcmTokenForUser(User user) async {
+  final token = await FirebaseMessaging.instance.getToken();
+  if (token == null) return;
+
+  await FirebaseFirestore.instance
+      .collection('userTokens')
+      .doc(user.uid)
+      .collection('tokens')
+      .doc(token)
+      .set({'createdAt': DateTime.now().toIso8601String()});
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,10 +60,8 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  await FirebaseFirestore.instance.collection('test').add({
-    'mensaje': 'Firebase conectado',
-    'fecha': DateTime.now(),
-  });
+  final messaging = FirebaseMessaging.instance;
+  await messaging.requestPermission();
 
   tz_data.initializeTimeZones();
   final offsetMs = DateTime.now().timeZoneOffset.inMilliseconds;
@@ -88,6 +100,12 @@ void main() async {
   final notificationService = NotificationService();
   await notificationService.init();
 
+  // --- workmanager: chequeo periódico en segundo plano (cada 15 min) ---
+  // Cubre el caso de tareas compartidas: notifica a CUALQUIER miembro,
+  // sin depender de que el dueño tenga la app abierta ni de Cloud Functions.
+  await Workmanager().initialize(callbackDispatcher);
+  await registerTaskReminderJob();
+
   final hiveDatasource = HiveDatasource();
   final firebaseRepo = TaskRepositoryFirebase();
 
@@ -97,24 +115,45 @@ void main() async {
     firebaseRepo: firebaseRepo,
   );
 
-  // Registrar token FCM del usuario autenticado
-  final auth = FirebaseAuth.instance;
-  final user = auth.currentUser;
-  if (user != null) {
-    final token = await FirebaseMessaging.instance.getToken();
-    if (token != null) {
+  final currentUser = FirebaseAuth.instance.currentUser;
+  if (currentUser != null) {
+    await _saveFcmTokenForUser(currentUser);
+  }
+
+  FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+    if (user != null) {
+      await _saveFcmTokenForUser(user);
+    }
+  });
+
+  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
       await FirebaseFirestore.instance
           .collection('userTokens')
           .doc(user.uid)
           .collection('tokens')
-          .doc(token)
+          .doc(newToken)
           .set({'createdAt': DateTime.now().toIso8601String()});
     }
-  }
+  });
+
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    final notification = message.notification;
+    if (notification != null) {
+      notificationService.showInstantNotification(
+        title: notification.title ?? 'Notificación',
+        body: notification.body ?? '',
+      );
+    }
+  });
+
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    debugPrint('Notificación abierta: ${message.data}');
+  });
 
   runApp(MyApp(repository: repository));
 }
-
 
 class MyApp extends StatelessWidget {
   final TaskRepository repository;
@@ -148,7 +187,6 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'StudyTrack',
-            // i18n
             localizationsDelegates: const [
               AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,

@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz_data;
@@ -63,13 +65,16 @@ class NotificationService {
     });
   }
 
+  /// Programa una alarma local exacta para el dueño en SU propio
+  /// dispositivo. Sigue siendo útil como recordatorio inmediato al crear
+  /// la tarea, pero NO cubre a los usuarios con quienes se comparte —
+  /// para eso está [checkAndNotifyDueTasks], pensado para correr
+  /// periódicamente vía workmanager en cada dispositivo.
   Future<void> scheduleTaskNotification(Task2 task) async {
     final scheduledTime =
         task.dueDate.subtract(Duration(hours: task.reminderHours));
 
-    if (scheduledTime.isBefore(DateTime.now())) {
-      return;
-    }
+    if (scheduledTime.isBefore(DateTime.now())) return;
 
     const AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
@@ -135,6 +140,57 @@ class NotificationService {
       body: '${task.title} ha sido marcada como hecha',
       notificationDetails: const NotificationDetails(android: androidDetails),
     );
+  }
+
+  /// Llamado periódicamente desde el callback de workmanager (isolate en
+  /// segundo plano, app puede estar cerrada). Revisa las tareas del
+  /// usuario actual —propias y compartidas—, y notifica localmente las
+  /// que ya cumplieron su horario de recordatorio y aún no le fueron
+  /// notificadas a ESTE usuario.
+  ///
+  /// Nota: esta consulta va directo a Firestore (no pasa por el
+  /// repositorio completo) porque el isolate de background necesita
+  /// mantenerse liviano.
+  Future<void> checkAndNotifyDueTasks() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    final uid = user.uid;
+
+    final snapshot = await FirebaseFirestore.instance
+        .collection('tasks')
+        .where('members', arrayContains: uid)
+        .where('completed', isEqualTo: false)
+        .get();
+
+    final now = DateTime.now();
+
+    for (final doc in snapshot.docs) {
+      final data = doc.data();
+      final notifiedMembers = (data['notifiedMembers'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          <String>[];
+
+      if (notifiedMembers.contains(uid)) continue; // ya notificado a este uid
+
+      final dueDate = DateTime.tryParse(data['dueDate'] ?? '');
+      final reminderHours = data['reminderHours'] as int? ?? 24;
+      if (dueDate == null) continue;
+
+      final reminderTime = dueDate.subtract(Duration(hours: reminderHours));
+      if (reminderTime.isAfter(now)) continue; // todavía no toca
+
+      final title = data['title'] as String? ?? 'Tarea';
+
+      await showInstantNotification(
+        title: 'Recordatorio de tarea',
+        body: 'La tarea "$title" vence pronto.',
+      );
+
+      await doc.reference.update({
+        'notifiedMembers': FieldValue.arrayUnion([uid]),
+      });
+    }
   }
 
   String _formatDate(DateTime date) {
