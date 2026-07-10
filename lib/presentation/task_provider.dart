@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../domain/task2.dart';
 import '../../domain/create_task_usecase.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class TaskProvider extends ChangeNotifier {
   final CreateTaskUseCase createTaskUseCase;
@@ -15,12 +16,13 @@ class TaskProvider extends ChangeNotifier {
     isLoading = true;
     statusMessage = "Guardando tarea...";
     notifyListeners();
-
+    final uid = FirebaseAuth.instance.currentUser!.uid;
     try {
       final uid = FirebaseAuth.instance.currentUser!.uid;
 
       final task = Task2(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
+        members: [uid],
         title: "Tarea PoC",
         description: "Descripción de prueba",
         dueDate: DateTime.now().add(const Duration(days: 1)),

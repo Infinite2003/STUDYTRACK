@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:workmanager/workmanager.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:timezone/data/latest.dart' as tz_data;
+import 'package:timezone/timezone.dart' as tz;
 
 import 'data/hive_datasource.dart';
 import 'data/task_repository_firebase.dart';
@@ -9,36 +13,31 @@ import 'data/task_repository_hybrid.dart';
 import 'data/notification_service.dart';
 import 'services/background_tasks.dart';
 
+import 'data/firestore_task_repository.dart';
+import 'data/auth_repository_impl.dart';
 import 'domain/create_task_usecase.dart';
 import 'domain/task_repository.dart';
 
 import 'viewmodels/task_viewmodel.dart';
 import 'viewmodels/survey_viewmodel.dart';
+import 'viewmodels/auth_viewmodel.dart';
 import 'services/survey_loader.dart';
-
 import 'presentation/preferences/preferences_provider.dart';
 import 'presentation/preferences/preferences_screen.dart';
 import 'ui/screens/calendar_screen.dart';
 import 'ui/screens/tasks_screen.dart';
 import 'ui/screens/about_screen.dart';
 import 'ui/screens/profile_screen.dart';
+import 'ui/screens/auth_guard.dart';
 import 'survey/survey_screen.dart';
 import 'theme/material_theme.dart';
-import 'package:timezone/data/latest.dart' as tz_data;
-import 'package:timezone/timezone.dart' as tz;
-
-import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'l10n/app_localizations.dart';
 
-import 'data/auth_repository_impl.dart';
-import 'viewmodels/auth_viewmodel.dart';
-import 'ui/screens/auth_guard.dart';
 
 /// Guarda (o actualiza) el token FCM del dispositivo para el usuario dado.
 Future<void> _saveFcmTokenForUser(User user) async {
@@ -64,9 +63,13 @@ void main() async {
   await messaging.requestPermission();
 
   tz_data.initializeTimeZones();
-  final offsetMs = DateTime.now().timeZoneOffset.inMilliseconds;
+  final offsetMs = DateTime.now().timeZoneOffset.inMilliseconds; // ✅ int
   tz.Location localLoc = tz.UTC;
-  const chileZones = ['America/Santiago', 'America/Punta_Arenas', 'Pacific/Easter'];
+  const chileZones = [
+    'America/Santiago',
+    'America/Punta_Arenas',
+    'Pacific/Easter'
+  ];
   for (final zoneName in chileZones) {
     try {
       final loc = tz.getLocation(zoneName);
@@ -169,6 +172,7 @@ class MyApp extends StatelessWidget {
             getTasksUseCase: GetTasksUseCase(repository),
             updateTaskUseCase: UpdateTaskUseCase(repository),
             deleteTaskUseCase: DeleteTaskUseCase(repository),
+            firestoreRepository: FirestoreTaskRepository(), // ✅ agregado
           ),
         ),
         ChangeNotifierProvider(
