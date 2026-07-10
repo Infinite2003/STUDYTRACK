@@ -8,16 +8,18 @@ class AuthViewModel extends ChangeNotifier {
   final AuthRepository repository;
 
   AuthViewModel(this.repository) {
-    // Escucha cambios de sesión automáticamente
-    repository.authStateChanges.listen((user) {
-      if (user != null) {
-        _status = AuthStatus.authenticated;
-      } else {
-        _status = AuthStatus.unauthenticated;
-      }
-      notifyListeners();
-    });
-  }
+  _status = repository.currentUser != null
+      ? AuthStatus.authenticated
+      : AuthStatus.unauthenticated;
+
+  repository.authStateChanges.listen((user) {
+    _status = user != null
+        ? AuthStatus.authenticated
+        : AuthStatus.unauthenticated;
+
+    notifyListeners();
+  });
+}
 
   AuthStatus _status = AuthStatus.initial;
   String? errorMessage;
@@ -34,7 +36,6 @@ class AuthViewModel extends ChangeNotifier {
 
     try {
       await repository.signInWithGoogle();
-      _status = AuthStatus.authenticated;
     } catch (e) {
       _status = AuthStatus.error;
       errorMessage = e.toString().contains('cancelado')
@@ -46,7 +47,6 @@ class AuthViewModel extends ChangeNotifier {
 
   Future<void> signOut() async {
     await repository.signOut();
-    _status = AuthStatus.unauthenticated;
     notifyListeners();
   }
 }

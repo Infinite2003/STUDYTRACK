@@ -99,7 +99,7 @@ class LoginScreen extends StatelessWidget {
                           'assets/icons/google_logo.png',
                           height: 22,
                           width: 22,
-                          errorBuilder: (_, __, ___) =>
+                          errorBuilder: (_, _, _) =>
                               const Icon(Icons.login),
                         ),
                   label: Text(

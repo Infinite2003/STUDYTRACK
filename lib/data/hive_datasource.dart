@@ -10,6 +10,10 @@ class HiveDatasource {
   Future<void> saveTask(Task2 task) async {
     await _box.put(task.id, task.toMap());
   }
+  Stream<List<Task2>> watchAllTasks() async* {
+  yield await getAllTasks();
+}
+
 
   Future<List<Task2>> getAllTasks() async {
     final list = _box.values

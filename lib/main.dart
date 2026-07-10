@@ -7,11 +7,14 @@ import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 
 import 'data/hive_datasource.dart';
-import 'data/task_repository_impl.dart';
+import 'data/task_repository_firebase.dart';
+import 'data/task_repository_hybrid.dart';
 import 'data/notification_service.dart';
 import 'data/firestore_task_repository.dart';
 import 'data/auth_repository_impl.dart';
 import 'domain/create_task_usecase.dart';
+import 'domain/task_repository.dart';
+
 import 'viewmodels/task_viewmodel.dart';
 import 'viewmodels/survey_viewmodel.dart';
 import 'viewmodels/auth_viewmodel.dart';
@@ -26,7 +29,17 @@ import 'ui/screens/auth_guard.dart';
 import 'survey/survey_screen.dart';
 import 'theme/material_theme.dart';
 import 'firebase_options.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'l10n/app_localizations.dart';
+
+import 'data/auth_repository_impl.dart';
+import 'viewmodels/auth_viewmodel.dart';
+import 'ui/screens/auth_guard.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +47,11 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  await FirebaseFirestore.instance.collection('test').add({
+    'mensaje': 'Firebase conectado',
+    'fecha': DateTime.now(),
+  });
 
   tz_data.initializeTimeZones();
   final offsetMs = DateTime.now().timeZoneOffset.inMilliseconds; // ✅ int
@@ -76,16 +94,35 @@ void main() async {
   final notificationService = NotificationService();
   await notificationService.init();
 
-  final repository = TaskRepositoryImpl(
-    hiveDatasource: HiveDatasource(),
+  final hiveDatasource = HiveDatasource();
+  final firebaseRepo = TaskRepositoryFirebase();
+
+  final repository = TaskRepositoryHybrid(
+    hiveDatasource: hiveDatasource,
     notificationService: notificationService,
+    firebaseRepo: firebaseRepo,
   );
+
+  // Registrar token FCM del usuario autenticado
+  final auth = FirebaseAuth.instance;
+  final user = auth.currentUser;
+  if (user != null) {
+    final token = await FirebaseMessaging.instance.getToken();
+    if (token != null) {
+      await FirebaseFirestore.instance
+          .collection('userTokens')
+          .doc(user.uid)
+          .collection('tokens')
+          .doc(token)
+          .set({'createdAt': DateTime.now().toIso8601String()});
+    }
+  }
 
   runApp(MyApp(repository: repository));
 }
 
 class MyApp extends StatelessWidget {
-  final TaskRepositoryImpl repository;
+  final TaskRepository repository;
   const MyApp({super.key, required this.repository});
 
   @override
