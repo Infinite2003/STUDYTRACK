@@ -492,3 +492,280 @@ flutter build apk --release --target-platform android-arm64
 ```
 
 > Para instalar el APK en un dispositivo Android ve a **Ajustes → Aplicaciones → (la app desde donde abres el archivo) → Permitir de esta fuente**.
+
+
+ ## Backend as a Service
+
+ ### Diagrama BaaS
+
+```mermaid
+ graph TD
+    subgraph CLIENT["Cliente Flutter - STUDYTRACK"]
+        UI[UI Layer - Screens/Widgets]
+        VM[ViewModel - ChangeNotifier]
+        R[Repository]
+    end
+
+    subgraph BAAS["Firebase - Backend as a Service"]
+        A[Authentication\nEmail/Password + Google]
+        F[Cloud Firestore\nBase de datos NoSQL]
+        C[Cloud Messaging FCM\nNotificaciones Push]
+        S[Security Rules]
+    end
+
+    subgraph LOCAL["Almacenamiento Local"]
+        H[Hive - Caché Offline]
+        P[SharedPreferences]
+    end
+
+    UI --> VM
+    VM --> R
+    R --> F
+    R --> H
+    VM --> A
+    VM --> C
+```
+
+## Estructura de Base de Datos
+
+Utilizamos una base de datos NoSQL
+
+```mermaid
+erDiagram
+    USERS ||--o{ TASKS : owns
+    USER_TOKENS ||--o{ TOKENS : contains
+
+    USERS {
+        string uid PK
+        string email
+        string name
+        string photoUrl
+    }
+
+    TASKS {
+        string id PK
+        string title
+        string description
+        string userId FK
+        array members
+        string dueDate
+        bool completed
+        int reminderHours
+    }
+
+    USER_TOKENS {
+        string userId PK
+    }
+
+    TOKENS {
+        string tokenId PK
+        string createdAt
+    }
+```
+
+## Reglas de Seguridad Firestore
+
+javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+      
+      match /tasks/{taskId} {
+        allow read: if request.auth != null &&
+          (request.auth.uid == userId || 
+           request.auth.uid in resource.data.members);
+        
+        allow create: if request.auth != null &&
+          request.auth.uid == userId &&
+          request.resource.data.userId == userId;
+        
+        allow update: if request.auth != null &&
+          (request.auth.uid == userId || 
+           request.auth.uid in resource.data.members);
+        
+        allow delete: if request.auth != null &&
+          request.auth.uid == userId;
+      }
+    }
+    
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+### Justificación de Reglas
+| Regla | |Propósito|
+|-----------|---------|
+| allow read: if request.auth != null |	Usuarios autenticados pueden ver perfiles públicos |
+| allow write: if request.auth.uid == userId |	Solo el usuario modifica su perfil |
+| allow read: if request.auth.uid in resource.data.members | Dueño y miembros comparten lectura de tareas |
+| allow create: if request.auth.uid == userId | Solo el dueño crea tareas en su colección |
+| allow update: if request.auth.uid in resource.data.members | Dueño y miembros actualizan tareas |
+| allow delete: if request.auth.uid == userId | Solo el dueño elimina tareas |
+
+## Manual de Despliegue
+
+### Prerrequisitos
+
+Antes de ejecutar el proyecto, asegúrate de tener instalado lo siguiente:
+
+| Herramienta | Versión recomendada |
+|--------------|--------------------|
+| Flutter SDK | 3.16.0 o superior |
+| Dart SDK | Incluido con Flutter |
+| Firebase CLI | 13.0 o superior |
+| Android Studio | 2023.1 o superior |
+| Git | Última versión |
+
+---
+
+### Paso 1: Configurar Firebase
+
+1. Crear un nuevo proyecto en **Firebase Console**.
+2. Registrar la aplicación Android (e iOS si corresponde).
+3. Habilitar **Firebase Authentication** con los proveedores:
+   - Email y contraseña.
+   - Google Sign-In.
+4. Crear una base de datos **Cloud Firestore**.
+5. Habilitar **Firebase Cloud Messaging (FCM)**.
+
+---
+
+### Paso 2: Agregar los archivos de configuración
+
+Descargar los archivos de configuración desde Firebase Console.
+
+#### Android
+
+Colocar el archivo:
+
+```text
+android/app/google-services.json
+```
+
+#### iOS
+
+Colocar el archivo:
+
+```text
+ios/Runner/GoogleService-Info.plist
+```
+
+---
+
+### Paso 3: Instalar dependencias
+
+Desde la carpeta raíz del proyecto ejecutar:
+
+```bash
+flutter pub get
+```
+
+---
+
+### Paso 4: Configurar Firebase CLI
+
+Instalar Firebase CLI:
+
+```bash
+npm install -g firebase-tools
+```
+
+Iniciar sesión:
+
+```bash
+firebase login
+```
+
+Inicializar Firestore (solo la primera vez):
+
+```bash
+firebase init firestore
+```
+
+Desplegar las reglas de seguridad:
+
+```bash
+firebase deploy --only firestore:rules
+```
+
+---
+
+### Paso 5: Configurar Firebase Cloud Messaging (FCM)
+
+#### Android
+
+Obtener la huella SHA-1:
+
+```bash
+cd android
+./gradlew signingReport
+```
+
+Agregar la SHA-1 obtenida en la configuración del proyecto de Firebase.
+
+#### iOS
+
+Configurar APNs desde Firebase Console y subir el certificado correspondiente.
+
+---
+
+### Paso 6: Ejecutar la aplicación
+
+#### Modo desarrollo
+
+```bash
+flutter run
+```
+
+---
+
+### Paso 7: Generar la aplicación
+
+#### APK de producción
+
+```bash
+flutter build apk --release --target-platform android-arm64
+```
+
+#### Android App Bundle (Google Play)
+
+```bash
+flutter build appbundle --release
+```
+
+---
+
+### Dependencias principales
+
+El proyecto utiliza las siguientes tecnologías:
+
+- Flutter
+- Provider
+- Firebase Authentication
+- Cloud Firestore
+- Firebase Cloud Messaging
+- Hive
+- Shared Preferences
+- Google Sign-In
+- Flutter Local Notifications
+- Timezone
+- Share Plus
+
+---
+
+### Configuración adicional
+
+Antes de ejecutar la aplicación, verificar que:
+
+- El proyecto esté correctamente conectado con Firebase.
+- Las reglas de Firestore hayan sido desplegadas.
+- Authentication tenga habilitado Email/Password y Google Sign-In.
+- Cloud Messaging esté configurado correctamente.
+- El archivo `google-services.json` (Android) o `GoogleService-Info.plist` (iOS) se encuentre en la ubicación correspondiente.
+- Se hayan instalado todas las dependencias mediante `flutter pub get`.
