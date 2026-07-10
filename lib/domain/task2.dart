@@ -1,6 +1,5 @@
 class Task2 {
-  final String id;
-  final String ownerUserId;        // quien creó la tarea
+  final String id;     // quien creó la tarea
   final List<String> members;      // todos los que pueden verla y editarla
   final String title;
   final String description;
@@ -11,7 +10,6 @@ class Task2 {
 
   Task2({
     required this.id,
-    required this.ownerUserId,
     required this.members,
     required this.title,
     required this.description,
@@ -34,7 +32,6 @@ class Task2 {
   }) {
     return Task2(
       id: id ?? this.id,
-      ownerUserId: ownerUserId ?? this.ownerUserId,
       members: members ?? this.members,
       title: title ?? this.title,
       description: description ?? this.description,
@@ -48,7 +45,6 @@ class Task2 {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'ownerUserId': ownerUserId,
       'members': members,
       'title': title,
       'description': description,
@@ -62,7 +58,6 @@ class Task2 {
   factory Task2.fromMap(Map<String, dynamic> map) {
     return Task2(
       id: map['id'] as String,
-      ownerUserId: map['ownerUserId'] as String? ?? '',
       members: List<String>.from(map['members'] as List? ?? []),
       title: map['title'] as String? ?? 'Sin título',
       description: map['description'] as String? ?? '',

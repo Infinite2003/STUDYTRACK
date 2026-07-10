@@ -30,11 +30,11 @@ class TaskViewModel extends ChangeNotifier {
   List<Task2> get pendingTasks => _tasks.where((t) => !t.completed).toList();
   List<Task2> get completedTasks => _tasks.where((t) => t.completed).toList();
 
-  List<Task2> get pendingTasks =>
+  /*List<Task2> get pendingTasks =>
       _tasks.where((t) => !t.completed).toList();
 
   List<Task2> get completedTasks =>
-      _tasks.where((t) => t.completed).toList();
+      _tasks.where((t) => t.completed).toList();*/
 
   List<Task2> sortedTasks(String sortBy) {
     final list = List<Task2>.from(_tasks);
@@ -127,6 +127,20 @@ class TaskViewModel extends ChangeNotifier {
       errorMessage = 'Error al actualizar: $e';
       notifyListeners();
       return false;
+    }
+  }
+
+  Future<String?> shareTaskWithEmail(String taskId, String email) async {
+    try {
+      final targetUserId =
+          await firestoreRepository.findUserIdByEmail(email);
+      if (targetUserId == null) {
+        return 'No se encontró un usuario con ese correo';
+      }
+      await firestoreRepository.shareTaskWithUser(taskId, targetUserId);
+      return null;
+    } catch (e) {
+      return 'Error al compartir: $e';
     }
   }
 

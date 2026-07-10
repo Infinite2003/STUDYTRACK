@@ -81,6 +81,7 @@ class _AddEditTaskSheetState extends State<AddEditTaskSheet> {
           : DateTime.now().millisecondsSinceEpoch.toString(),
       title: _titleCtrl.text.trim(),
       description: _descCtrl.text.trim(),
+       members: _isEditing ? widget.taskToEdit!.members : [uid],
       dueDate: _dueDate,
       completed: _isEditing ? widget.taskToEdit!.completed : false,
       reminderHours: _reminderHours,

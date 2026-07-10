@@ -22,6 +22,7 @@ class TaskProvider extends ChangeNotifier {
 
       final task = Task2(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
+        members: [uid],
         title: "Tarea PoC",
         description: "Descripción de prueba",
         dueDate: DateTime.now().add(const Duration(days: 1)),

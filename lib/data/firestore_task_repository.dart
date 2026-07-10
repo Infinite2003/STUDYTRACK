@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../domain/task2.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class FirestoreTaskRepository {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -28,11 +29,48 @@ class FirestoreTaskRepository {
             .toList());
   }
 
-  Future<void> shareTaskWithUser(String taskId, String targetUserId) async {
-    await _tasks.doc(taskId).update({
-      'members': FieldValue.arrayUnion([targetUserId]),
-    });
-  }
+  Future<void> shareTaskWithUser(
+        String taskId,
+        String targetUserId,
+    ) async {
+      final currentUid = FirebaseAuth.instance.currentUser!.uid;
+
+      // Documento de la tarea del usuario actual
+      final sourceDoc = await _db
+          .collection('users')
+          .doc(currentUid)
+          .collection('tasks')
+          .doc(taskId)
+          .get();
+
+      if (!sourceDoc.exists) {
+        throw Exception('La tarea no existe');
+      }
+
+      final data = sourceDoc.data()!;
+
+      // Actualizar members
+      final members = List<String>.from(data['members'] ?? []);
+
+      if (!members.contains(targetUserId)) {
+        members.add(targetUserId);
+      }
+
+      data['members'] = members;
+
+      // Actualizar la copia del dueño
+      await sourceDoc.reference.update({
+        'members': members,
+      });
+
+      // Crear la copia para el usuario compartido
+      await _db
+          .collection('users')
+          .doc(targetUserId)
+          .collection('tasks')
+          .doc(taskId)
+          .set(data);
+    }
 
   Future<void> removeUserFromTask(String taskId, String targetUserId) async {
     await _tasks.doc(taskId).update({

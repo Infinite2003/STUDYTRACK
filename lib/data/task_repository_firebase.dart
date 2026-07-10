@@ -35,6 +35,7 @@ class TaskRepositoryFirebase implements TaskRepository {
           'id': task.id,
           'title': task.title,
           'description': task.description,
+          'members': task.members,
           'dueDate': task.dueDate.toIso8601String(),
           'completed': task.completed,
           'reminderHours': task.reminderHours,
@@ -57,6 +58,7 @@ class TaskRepositoryFirebase implements TaskRepository {
         id: data['id'] ?? doc.id,
         title: data['title'] ?? '',
         description: data['description'] ?? '',
+        members: List<String>.from(data['members'] ?? [uid]),
         dueDate: DateTime.tryParse(data['dueDate'] ?? '') ?? DateTime.now(),
         completed: data['completed'] ?? false,
         reminderHours: data['reminderHours'] ?? 24,
@@ -75,6 +77,7 @@ class TaskRepositoryFirebase implements TaskRepository {
               final data = doc.data();
               return Task2(
                 id: data['id'] ?? doc.id,
+                members: List<String>.from(data['members'] ?? [uid]),
                 title: data['title'] ?? '',
                 description: data['description'] ?? '',
                 dueDate:
@@ -97,6 +100,7 @@ Stream<List<Task2>> watchAllTasks() {
             final data = doc.data();
             return Task2(
               id: data['id'] ?? doc.id,
+              members: List<String>.from(data['members'] ?? [uid]),
               title: data['title'] ?? '',
               description: data['description'] ?? '',
               dueDate:
@@ -104,6 +108,7 @@ Stream<List<Task2>> watchAllTasks() {
               completed: data['completed'] ?? false,
               reminderHours: data['reminderHours'] ?? 24,
               userId: uid,
+              
             );
           }).toList());
 }
