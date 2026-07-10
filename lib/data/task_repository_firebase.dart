@@ -26,23 +26,28 @@ class TaskRepositoryFirebase implements TaskRepository {
   Future<void> saveTask(Task2 task) async {
     final uid = _auth.currentUser!.uid;
     await _saveUserToken();
-    await _db.collection('tasks').doc(task.id).set({
-      'id': task.id,
-      'title': task.title,
-      'description': task.description,
-      'dueDate': task.dueDate.toIso8601String(),
-      'completed': task.completed,
-      'reminderHours': task.reminderHours,
-      'userId': uid,
-    });
+    await _db
+        .collection('users')
+        .doc(uid)
+        .collection('tasks')
+        .doc(task.id)
+        .set({
+          'id': task.id,
+          'title': task.title,
+          'description': task.description,
+          'dueDate': task.dueDate.toIso8601String(),
+          'completed': task.completed,
+          'reminderHours': task.reminderHours,
+        });
   }
 
   @override
   Future<List<Task2>> getAllTasks() async {
     final uid = _auth.currentUser!.uid;
     final snapshot = await _db
+        .collection('users')
+        .doc(uid)
         .collection('tasks')
-        .where('userId', isEqualTo: uid)
         .get();
 
     return snapshot.docs.map((doc) {
@@ -54,25 +59,35 @@ class TaskRepositoryFirebase implements TaskRepository {
         dueDate: DateTime.tryParse(data['dueDate'] ?? '') ?? DateTime.now(),
         completed: data['completed'] ?? false,
         reminderHours: data['reminderHours'] ?? 24,
-        userId: data['userId'] ?? uid,
+        userId: uid,
       );
     }).toList();
   }
 
   @override
   Future<void> updateTask(Task2 task) async {
-    await _db.collection('tasks').doc(task.id).update({
-      'title': task.title,
-      'description': task.description,
-      'dueDate': task.dueDate.toIso8601String(),
-      'completed': task.completed,
-      'reminderHours': task.reminderHours,
-      'userId': task.userId,
-    });
+    await _db
+        .collection('users')
+        .doc(task.userId)
+        .collection('tasks')
+        .doc(task.id)
+        .update({
+          'title': task.title,
+          'description': task.description,
+          'dueDate': task.dueDate.toIso8601String(),
+          'completed': task.completed,
+          'reminderHours': task.reminderHours,
+        });
   }
 
   @override
   Future<void> deleteTask(String id) async {
-    await _db.collection('tasks').doc(id).delete();
+    final uid = _auth.currentUser!.uid;
+    await _db
+        .collection('users')
+        .doc(uid)
+        .collection('tasks')
+        .doc(id)
+        .delete();
   }
 }

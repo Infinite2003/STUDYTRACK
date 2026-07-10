@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "602901731854-thfrp6gga9isspac1kk3bi4sab87fbrn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "cl.Pereira.STUDYTRACK",
+            "certificate_hash": "ea43dac5f4d8dcb508c0276f945bf1f5a72adb69"
+          }
+        },
+        {
           "client_id": "602901731854-gjodmloafjfs9bt37c59rj56ulqrupfr.apps.googleusercontent.com",
           "client_type": 3
         }
